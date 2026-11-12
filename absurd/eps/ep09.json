@@ -1,0 +1,28 @@
+{
+  "slug": "dome-over-the-city",
+  "title": ["POV:", "A billionaire put a dome<br>over the city."],
+  "titleUntil": 3.2,
+  "labels": [[3.4, 9.4, "2030"], [15.3, 21.6, "MONTH 3"], [28.7, 35.2, "YEAR 2"], [45.6, 52.2, "YEAR 5"]],
+  "subs": [
+    [3.3, 6.8, "In 2030, a billionaire put a glass dome over the city.", "In twenty thirty, a billionaire put a glass dome over the city."],
+    [6.8, 9.6, "To control the weather."],
+    [9.6, 12.6, "It was always 22 degrees.", "It was always twenty-two degrees."],
+    [12.6, 15.2, "It never rained."],
+    [15.3, 18.6, "Then sunsets became a premium feature."],
+    [18.6, 21.8, "Free users get the sun switched off at 8 p.m.", "Free users get the sun switched off at eight p.m."],
+    [21.9, 25.0, "Like a light."],
+    [25.1, 28.6, "Snow is available on weekends. For a fee."],
+    [28.7, 32.2, "Then the city next door got jealous."],
+    [32.2, 35.4, "They built a bigger dome. Over our dome."],
+    [35.5, 38.8, "Now we get their weather."],
+    [38.8, 42.0, "It has been raining for six months."],
+    [42.1, 45.6, "Inside both domes."],
+    [45.6, 49.0, "Then a third city built a dome over all of us."],
+    [49.1, 52.4, "Nobody has seen the real sky since."],
+    [52.5, 55.8, "Scientists believe it's still up there."],
+    [55.8, 59.2, "Somewhere."]
+  ],
+  "amb": [[0, 21.9, "city"], [21.9, 25.0, "night"], [25.1, 28.6, "wind"], [28.7, 35.4, "city"], [35.5, 45.6, "rain"], [45.6, 60, "wind"]],
+  "sfx": [[21.95, "click"], [22.0, "thud"], [25.3, "register"], [32.4, "rumble"], [46.0, "rumble"]],
+  "music": {"prog": "pop"}
+}

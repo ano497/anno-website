@@ -52,6 +52,8 @@ export async function build(K) {
   sign('LUXSTAY', 14, 2.6, { bg: NAVY, fg: GOLD }, 0, 6.2, 12.1, HT);
   const ropeTube = cyl(2.5, 2.5, 600, mat(0xbfe3ff, { transparent: true, opacity: 0.3, roughness: 0.05 }), 0, 23, 0, HT, 12); ropeTube.castShadow = false;
   const car = box(3.6, 3.6, 3.6, 0xd9b45a, 0, 0, 0, HT); car.castShadow = false;
+  const carL = new THREE.PointLight(0xffe2b0, 14, 30, 1.4); carL.position.set(0, 1.5, 7); car.add(carL);
+  sign(['LUXSTAY ▼', 'ARRIVAL 3h 58m'], 3.2, 1.4, { bg: NAVY, fg: GOLD }, 0, 1.9, 1.82, car);
   const hotelLights = []; for (const [x, z] of [[-18, 14], [18, 14], [-18, -14], [18, -14]]) { const l = new THREE.SpotLight(0xffe2b0, 0, 120, 0.7, 0.5, 1.2); l.position.set(x, 4, z); l.target.position.set(x * 2.5, 0, z * 3); HT.add(l, l.target); hotelLights.push(l); }
   const glow = new THREE.PointLight(0xffd9a0, 0, 120, 1.2); glow.position.set(0, 14, 16); HT.add(glow);
   // roof "pool" sign + ladder + swimmer
@@ -65,7 +67,7 @@ export async function build(K) {
   dp.userData = {};
   const lightsOn = (t) => smooth(24.8, 25.2, t);
   HT.userData.update = (t) => {
-    const on = lightsOn(t); winMat.emissiveIntensity = on * 1.6; hotelLights.forEach((l) => (l.intensity = on * 900)); glow.intensity = on * 350;
+    const on = lightsOn(t); winMat.emissiveIntensity = on * 1.0; hotelLights.forEach((l) => (l.intensity = on * 450)); glow.intensity = on * 120;
     const cy = 23 + 300 - ((t * 9) % 300); car.position.set(0, cy, 0);
     smallF.visible = t > 27.4; bigF.visible = t > 30.3;
   };
@@ -112,9 +114,9 @@ export async function build(K) {
 
   // ---------------- shots ----------------
   shot({ t0: 0, t1: 6.8, set: 'surface', from: [60, 26, 80], to: [40, 18, 56], look: [0, 8, 0], fov: 42, focus: 0.5 });
-  shot({ t0: 6.8, t1: 9.6, set: 'deep', from: [14, 200, 30], to: [14, 60, 40], look: [0, 120, 0], lookTo: [0, 10, 0], fov: 46, focus: 0.5 });
+  shot({ t0: 6.8, t1: 9.6, set: 'deep', from: [0, 0, 0], look: [0, 0, 0], fov: 46, focus: 0.5, update: (t) => { const y = 120 - (t - 6.8) * 30; car.position.y = y; camera.position.set(9, y - 6, 12); camera.lookAt(0, y - 2, 0); } });
   shot({ t0: 9.6, t1: 12.6, set: 'room', from: [2.5, 2.2, 3.5], to: [2, 2.1, 2.5], look: [0, 2, -4.8], fov: 44, focus: 0.55, band: 0.15 });
-  shot({ t0: 12.6, t1: 15.4, set: 'deep', from: [12, 160, 22], to: [10, 150, 20], look: [0, 120, 0], fov: 44, focus: 0.5, update: (t) => { car.position.y = 150 - (t - 12.6) * 2; } });
+  shot({ t0: 12.6, t1: 15.4, set: 'deep', from: [0, 0, 0], look: [0, 0, 0], fov: 42, focus: 0.5, update: (t) => { const y = 160 - (t - 12.6) * 0.6; car.position.y = y; camera.position.set(3, y + 2.2, 9); camera.lookAt(0, y + 1.6, 0); } });
   shot({ t0: 15.4, t1: 18.3, set: 'lift', from: [1.2, 1.7, 1.8], to: [1.0, 1.65, 1.5], look: [0.2, 1.5, -1], fov: 50, focus: 0.55, band: 0.15 });
   shot({ t0: 18.3, t1: 21.6, set: 'deep', from: [-2, 28, 20], to: [-3, 27, 17], look: [-8, 24, 6], fov: 44, focus: 0.55 });
   shot({ t0: 21.6, t1: 24.6, set: 'room', from: [1.6, 1.8, 0.6], to: [1.4, 1.8, 0.2], look: [0.2, 1.8, -4.8], fov: 46, focus: 0.55, band: 0.15, update: (t) => { guest.pose({ armR: -1.6, armL: -0.3 }); } });
@@ -122,7 +124,7 @@ export async function build(K) {
   shot({ t0: 27.5, t1: 33.3, set: 'deep', from: [30, 14, 50], to: [50, 22, 80], look: [0, 10, 8], fov: 44, focus: 0.5 });
   shot({ t0: 33.3, t1: 39.7, set: 'lobby', from: [14, 6, 22], to: [10, 5.5, 17], look: [-3, 4, -2], fov: 50, focus: 0.5 });
   shot({ t0: 39.7, t1: 46.1, set: 'lobby', from: [6, 6, 4], to: [7, 6.5, 0], look: [12, 7, -14.7], fov: 46, focus: 0.5, band: 0.16 });
-  shot({ t0: 46.1, t1: 49.6, set: 'deep', from: [10, 12, 32], to: [6, 13, 26], look: [-6, 12, 10], fov: 44, focus: 0.5 });
+  shot({ t0: 46.1, t1: 49.6, set: 'deep', from: [26, 14, 48], to: [20, 13, 40], look: [-4, 12, 8], fov: 44, focus: 0.5 });
   shot({ t0: 49.6, t1: 52.7, set: 'lobby', from: [14, 3, 2], to: [13, 2.8, 0], look: [9, 1.5, -8], fov: 46, focus: 0.55, band: 0.15 });
   shot({ t0: 52.7, t1: 60, set: 'surface', from: [-2, 5, 26], to: [-4, 4.5, 22], look: [-6, 3.6, 14], fov: 44, focus: 0.55 });
 }

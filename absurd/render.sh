@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Render one episode: ./render.sh 01   (needs KOKORO_DIR for the narration)
 set -euo pipefail
+KOKORO_DIR=${KOKORO_DIR:-/tmp/claude-0/-home-user-anno-website/b8b10682-fbba-58ae-a91d-db24e46e626a/scratchpad/kokoro}
 cd "$(dirname "$0")"
 EP=$1; SLUG=$(python3 -c "import json;print(json.load(open('eps/ep$EP.json'))['slug'])")
 mkdir -p segments/$EP eps/out videos

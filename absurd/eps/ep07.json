@@ -1,0 +1,28 @@
+{
+  "slug": "sahara-parking-lot",
+  "title": ["POV:", "Someone turned the Sahara<br>into a parking lot."],
+  "titleUntil": 3.2,
+  "labels": [[3.4, 9.4, "2031"], [16.1, 22.4, "OPENING DAY"], [35.7, 42.0, "YEAR 3"], [49.1, 55.6, "LAST WEEK"]],
+  "subs": [
+    [3.3, 6.8, "In 2031, the world officially ran out of parking.", "In twenty thirty-one, the world officially ran out of parking."],
+    [6.8, 9.6, "So someone paved the Sahara."],
+    [9.6, 12.8, "Nine million square kilometers. Forty billion spaces."],
+    [12.8, 16.0, "Painting the lines took three years."],
+    [16.1, 19.4, "On opening day, it was full by noon."],
+    [19.4, 22.6, "Drivers circled for weeks looking for a spot."],
+    [22.7, 26.0, "Some of them gave up and moved in."],
+    [26.0, 29.2, "Row K-4000 is now a small town.", "Row K, four thousand, is now a small town."],
+    [29.3, 32.6, "Camels were hired as shuttle buses."],
+    [32.6, 35.6, "They charge by the dune."],
+    [35.7, 39.0, "Then the sand started blowing back in."],
+    [39.0, 42.2, "Every morning, the cars are buried again."],
+    [42.3, 45.8, "The parking lot now needs its own parking lot."],
+    [45.8, 49.0, "For the shovels."],
+    [49.1, 52.6, "Last week, a man finally found a free spot."],
+    [52.6, 55.8, "It was right next to his own car."],
+    [55.8, 59.2, "He had parked there in 2031.", "He had parked there, in twenty thirty-one."]
+  ],
+  "amb": [[0, 16.1, "wind"], [16.1, 29.2, "traffic"], [29.3, 35.6, "wind"], [35.7, 42.2, "mountain"], [42.3, 60, "wind"]],
+  "sfx": [[16.6, "horn"], [20.0, "horn"], [21.4, "horn"], [33.0, "register"], [36.0, "whoosh"], [52.8, "thud"]],
+  "music": {"prog": "pop"}
+}

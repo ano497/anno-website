@@ -1,0 +1,28 @@
+{
+  "slug": "countries-sold-their-landmarks",
+  "title": ["POV:", "Countries started selling<br>their landmarks."],
+  "titleUntil": 3.2,
+  "labels": [[3.4, 9.6, "2035"], [16.3, 22.4, "MONTH 8"], [38.9, 45.2, "YEAR 3"]],
+  "subs": [
+    [3.3, 6.8, "In 2035, a country sold its most famous tower.", "In twenty thirty-five, a country sold its most famous tower."],
+    [6.8, 10.0, "It was moved to a desert. Piece by piece."],
+    [10.0, 13.2, "Tourists still visit the old spot."],
+    [13.2, 16.2, "They take photos of where it used to be."],
+    [16.3, 19.4, "Then everyone started selling."],
+    [19.4, 22.8, "A famous clock tower was sold to a shopping mall."],
+    [22.8, 26.0, "It now runs fifteen minutes fast. So people shop faster."],
+    [26.1, 29.4, "A pyramid was bought by a gym."],
+    [29.4, 32.4, "It is now the world's largest stair machine."],
+    [32.5, 35.8, "A giant statue went to a car dealership."],
+    [35.8, 38.8, "It now holds a sign that says SALE."],
+    [38.9, 42.4, "Then a small island country sold itself."],
+    [42.4, 45.6, "It was towed to a new ocean."],
+    [45.7, 49.0, "Citizens woke up in a new time zone."],
+    [49.0, 52.2, "And with a new language."],
+    [52.3, 55.6, "Nobody has told them what the country is called now."],
+    [55.6, 59.2, "The new owner is still deciding."]
+  ],
+  "amb": [[0, 6.8, "city"], [6.8, 10.0, "wind"], [10.0, 19.4, "crowd"], [19.4, 26.0, "crowd"], [26.1, 32.4, "wind"], [32.5, 38.8, "traffic"], [38.9, 45.6, "waves"], [45.7, 60, "birds"]],
+  "sfx": [[3.6, "rumble"], [13.4, "click"], [14.4, "click"], [15.2, "click"], [16.5, "thud"], [23.0, "ding"], [36.0, "horn"], [42.6, "horn"], [45.9, "ding"]],
+  "music": {"prog": "wonder"}
+}
