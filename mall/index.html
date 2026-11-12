@@ -1,0 +1,46 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Locked In The Mall</title>
+<style>
+  html, body { margin: 0; padding: 0; background: #000; overflow: hidden; }
+  #stage { position: relative; width: 1080px; height: 1920px; overflow: hidden; }
+  canvas { display: block; }
+  .serif { font-family: 'DejaVu Serif', Georgia, serif; font-weight: 700; }
+  /* channel title style: gold tracked "POV:" + white serif */
+  #title { position: absolute; left: 0; top: 285px; width: 1000px; opacity: 0; }
+  #title .pov { color: #c8a45c; font-size: 66px; letter-spacing: 18px; text-shadow: 3px 4px 6px rgba(0,0,0,.6); }
+  #title .main { color: #fff; font-size: 78px; line-height: 1.12; margin-top: 10px;
+    text-shadow: 4px 5px 0 rgba(0,0,0,.55), 0 0 18px rgba(0,0,0,.45); }
+  #sub { position: absolute; left: 60px; right: 60px; top: 1215px; text-align: center;
+    color: #fff; font-size: 64px; line-height: 1.18;
+    text-shadow: 3px 4px 0 rgba(0,0,0,.75), 0 0 22px rgba(0,0,0,.9); }
+  #sub.gold { color: #e3c27a; }
+  #cctv { position: absolute; inset: 0; display: none; font-family: 'DejaVu Sans Mono', monospace; color: #e8f2e6;
+    font-size: 40px; text-shadow: 2px 2px 0 #000; }
+  #cctv .tl { position: absolute; left: 60px; top: 1000px; }
+  #cctv .tr { position: absolute; right: 60px; top: 1000px; }
+  #cctv .bl { position: absolute; left: 60px; top: 1060px; }
+  #cctv .rec::before { content: '\25CF '; color: #ff3b30; }
+  #cctv .frame { position: absolute; left: 36px; right: 36px; top: 230px; height: 920px; border: 3px solid rgba(232,242,230,.35); }
+  #end { position: absolute; left: 0; right: 0; top: 820px; text-align: center; color: #fff; font-size: 120px; letter-spacing: 6px; opacity: 0;
+    text-shadow: 0 0 30px rgba(255,255,255,.25); }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="cctv"><div class="tl" id="camlabel">CAM 03 · ATRIUM</div><div class="tr rec">REC</div><div class="bl" id="camtime">11-12-2026 00:00:00</div></div>
+  <div id="title" class="serif"><div class="pov">POV:</div><div class="main">You got locked inside<br>a mall overnight.</div></div>
+  <div id="sub" class="serif"></div>
+  <div id="end" class="serif">PART 2?</div>
+</div>
+<script type="importmap">
+{ "imports": {
+  "three": "./node_modules/three/build/three.module.js",
+  "three/addons/": "./node_modules/three/examples/jsm/"
+} }
+</script>
+<script type="module" src="scene.js"></script>
+</body>
+</html>
