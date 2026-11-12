@@ -1,0 +1,44 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Nothing Ever Happens</title>
+<style>
+  @font-face {
+    font-family: 'Archivo Black';
+    src: url('node_modules/@fontsource/archivo-black/files/archivo-black-latin-400-normal.woff2') format('woff2');
+  }
+  html, body { margin: 0; padding: 0; background: #000; overflow: hidden; }
+  #stage { position: relative; width: 1080px; height: 1920px; overflow: hidden; }
+  canvas { display: block; }
+  #vignette {
+    position: absolute; inset: 0; pointer-events: none;
+    background: radial-gradient(ellipse at 50% 50%, rgba(0,0,0,0) 55%, rgba(0,0,0,.38) 100%);
+  }
+  #fade { position: absolute; inset: 0; background: #000; opacity: 0; pointer-events: none; }
+  #cap {
+    position: absolute; left: 0; right: 0; top: 215px; text-align: center;
+    font-family: 'Archivo Black', 'Inter', sans-serif; font-size: 128px; line-height: 1;
+    text-transform: uppercase; letter-spacing: 1px; transform-origin: 50% 50%;
+  }
+  #cap span { position: absolute; left: 0; right: 0; white-space: nowrap; }
+  #cap .shadow { color: #000; -webkit-text-stroke: 22px #000; transform: translate(7px, 9px); opacity: .75; }
+  #cap .stroke { color: #000; -webkit-text-stroke: 22px #000; }
+  #cap .fill { color: #fff; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="vignette"></div>
+  <div id="fade"></div>
+  <div id="cap"><span class="shadow"></span><span class="stroke"></span><span class="fill"></span></div>
+</div>
+<script type="importmap">
+{ "imports": {
+  "three": "./node_modules/three/build/three.module.js",
+  "three/addons/": "./node_modules/three/examples/jsm/"
+} }
+</script>
+<script type="module" src="scene.js"></script>
+</body>
+</html>
