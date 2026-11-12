@@ -1,0 +1,130 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Channel Avatar</title>
+<style>
+  html, body { margin: 0; background: #000; }
+  #stage { position: relative; width: 1080px; height: 1080px; overflow: hidden; }
+  #rec { position: absolute; display: none; font: bold 64px 'DejaVu Sans Mono', monospace; color: #e8f2e6; }
+  #rec::before { content: '\25CF '; color: #ff3b30; }
+</style>
+</head>
+<body>
+<div id="stage"><div id="rec">REC</div></div>
+<script type="importmap">
+{ "imports": { "three": "../mall/node_modules/three/build/three.module.js", "three/addons/": "../mall/node_modules/three/examples/jsm/" } }
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+import { RectAreaLightUniformsLib } from 'three/addons/lights/RectAreaLightUniformsLib.js';
+
+const S = 1080;
+const variant = new URLSearchParams(location.search).get('v') || 'gold';
+const PAL = {
+  gold: { light: 0xffcf8a, glow: ['#fff3d6', '#ffcf8a', '#c8a45c'], fog: 0x120c05 },
+  red: { light: 0xff5a4a, glow: ['#ffe2dc', '#ff6a55', '#a3221a'], fog: 0x140404 },
+  cctv: { light: 0xffcf8a, glow: ['#fff3d6', '#ffcf8a', '#c8a45c'], fog: 0x120c05 },
+}[variant];
+
+RectAreaLightUniformsLib.init();
+const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+renderer.setPixelRatio(1); renderer.setSize(S, S);
+renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.0;
+document.getElementById('stage').prepend(renderer.domElement);
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x000000);
+scene.fog = new THREE.FogExp2(PAL.fog, 0.06);
+const camera = new THREE.PerspectiveCamera(20, 1, 0.1, 100);
+camera.position.set(0, 1.1, 7.6); camera.lookAt(0, 1.5, 0);
+
+// doorway: glowing panel, brighter in the middle and at the floor
+const c = document.createElement('canvas'); c.width = 256; c.height = 512;
+const g = c.getContext('2d');
+const gr = g.createRadialGradient(128, 330, 10, 128, 300, 330);
+gr.addColorStop(0, PAL.glow[0]); gr.addColorStop(0.45, PAL.glow[1]); gr.addColorStop(1, PAL.glow[2]);
+g.fillStyle = gr; g.fillRect(0, 0, 256, 512);
+const doorTex = new THREE.CanvasTexture(c); doorTex.colorSpace = THREE.SRGBColorSpace;
+const door = new THREE.Mesh(new THREE.PlaneGeometry(1.25, 2.55), new THREE.MeshBasicMaterial({ map: doorTex, toneMapped: true }));
+door.material.color.setScalar(1.0);
+door.position.set(0, 1.275, 0); scene.add(door);
+// wall around the door + thin frame
+const wall = new THREE.MeshStandardMaterial({ color: 0x0b0b0c, roughness: 0.9 });
+for (const [w, h, x, y] of [[10, 10, -5.625, 5], [10, 10, 5.625, 5], [1.25, 8, 0, 6.55]]) {
+  const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), wall); m.position.set(x, y, 0.001); scene.add(m);
+}
+const frameMat = new THREE.MeshStandardMaterial({ color: 0x1a1714, roughness: 0.6, metalness: 0.4 });
+for (const [w, h, x, y] of [[0.07, 2.62, -0.66, 1.31], [0.07, 2.62, 0.66, 1.31], [1.39, 0.07, 0, 2.6]]) {
+  const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, 0.12), frameMat); m.position.set(x, y, 0.04); scene.add(m);
+}
+// floor that catches the light spill
+const floor = new THREE.Mesh(new THREE.PlaneGeometry(30, 30), new THREE.MeshStandardMaterial({ color: 0x2a2622, roughness: 0.32, metalness: 0.15 }));
+floor.rotation.x = -Math.PI / 2; floor.receiveShadow = true; scene.add(floor);
+const rect = new THREE.RectAreaLight(PAL.light, 5, 1.25, 2.55);
+rect.position.set(0, 1.275, 0.02); rect.lookAt(0, 1.275, 5); scene.add(rect);
+const spill = new THREE.SpotLight(PAL.light, 26, 14, 0.5, 0.8, 1.6);
+spill.position.set(0, 1.6, -0.9); spill.castShadow = true; spill.shadow.mapSize.set(2048, 2048); spill.shadow.radius = 4; spill.target.position.set(0, 0, 4); scene.add(spill, spill.target);
+
+// the figure: backlit, reads as a pure silhouette
+const black = new THREE.MeshStandardMaterial({ color: 0x050505, roughness: 1 });
+const fig = new THREE.Group(); fig.position.set(0, 0, 0.55); scene.add(fig);
+const cap = (r, len, x, y, z, rz = 0) => { const m = new THREE.Mesh(new THREE.CapsuleGeometry(r, len, 6, 16), black); m.position.set(x, y, z); m.rotation.z = rz; m.castShadow = true; fig.add(m); return m; };
+cap(0.062, 0.78, -0.075, 0.46, 0, 0.012); cap(0.062, 0.78, 0.075, 0.46, 0, -0.012); // legs
+const torso = cap(0.15, 0.46, 0, 1.22, 0); torso.scale.set(1.12, 1, 0.6);
+cap(0.045, 0.62, -0.19, 1.02, 0, 0.06); cap(0.045, 0.64, 0.192, 0.99, 0, -0.05); // arms
+const head = new THREE.Mesh(new THREE.SphereGeometry(0.115, 24, 18), black); head.scale.set(0.9, 1.12, 1); head.position.set(0.035, 1.67, 0); head.rotation.z = -0.32; head.castShadow = true; fig.add(head);
+const neck = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.06, 0.12, 12), black); neck.position.set(0.012, 1.54, 0); neck.rotation.z = -0.2; fig.add(neck);
+// long shadow toward the camera
+const sh = new THREE.Mesh(new THREE.PlaneGeometry(0.42, 3.2), new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.85 }));
+
+
+// dust in the beam
+const N = 900, pos = new Float32Array(N * 3);
+let sd = 5; const rnd = () => ((sd = (sd * 16807) % 2147483647) - 1) / 2147483646;
+for (let i = 0; i < N; i++) { pos[i * 3] = (rnd() - 0.5) * 2.2; pos[i * 3 + 1] = rnd() * 2.8; pos[i * 3 + 2] = 0.2 + rnd() * 3.5; }
+const pg = new THREE.BufferGeometry(); pg.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+scene.add(new THREE.Points(pg, new THREE.PointsMaterial({ color: PAL.light, size: 0.012, transparent: true, opacity: 0.55, blending: THREE.AdditiveBlending, depthWrite: false })));
+
+// red floor indicator for the elevator variant
+if (variant === 'red') {
+  const ic = document.createElement('canvas'); ic.width = 256; ic.height = 128;
+  const ig = ic.getContext('2d'); ig.fillStyle = '#050505'; ig.fillRect(0, 0, 256, 128);
+  ig.fillStyle = '#ff4a3a'; ig.font = 'bold 96px DejaVu Sans Mono'; ig.textAlign = 'center'; ig.textBaseline = 'middle'; ig.fillText('B3', 128, 68);
+  const it = new THREE.CanvasTexture(ic); it.colorSpace = THREE.SRGBColorSpace;
+  const ind = new THREE.Mesh(new THREE.PlaneGeometry(0.62, 0.31), new THREE.MeshBasicMaterial({ map: it }));
+  ind.material.color.setScalar(1.0); ind.position.set(0, 2.92, 0.05); scene.add(ind);
+}
+
+const composer = new EffectComposer(renderer);
+composer.addPass(new RenderPass(scene, camera));
+composer.addPass(new UnrealBloomPass(new THREE.Vector2(S, S), 0.7, 0.5, 0.72));
+composer.addPass(new OutputPass());
+composer.addPass(new ShaderPass({
+  uniforms: { tDiffuse: { value: null }, uCCTV: { value: variant === 'cctv' ? 1 : 0 } },
+  vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix*modelViewMatrix*vec4(position,1.); }',
+  fragmentShader: `uniform sampler2D tDiffuse; uniform float uCCTV; varying vec2 vUv;
+    float h(vec2 p){ return fract(sin(dot(p, vec2(12.9898,78.233))) * 43758.5453); }
+    void main(){
+      vec3 col = texture2D(tDiffuse, vUv).rgb;
+      if (uCCTV > 0.5) {
+        float l = dot(col, vec3(.299,.587,.114));
+        col = vec3(pow(l, 0.85) * 1.2) * vec3(0.84, 1.0, 0.88);
+        col *= 0.9 + 0.1 * sin(vUv.y * 1080.0 * 0.9);
+      }
+      col += (h(vUv * 1500.0) - 0.5) * 0.045;
+      col *= smoothstep(0.78, 0.3, length(vUv - 0.5));   // circle-crop friendly vignette
+      gl_FragColor = vec4(col, 1.0);
+    }`,
+}));
+composer.render();
+if (variant === 'cctv') { const r = document.getElementById('rec'); r.style.display = 'block'; r.style.left = '0'; r.style.right = '0'; r.style.textAlign = 'center'; r.style.top = '60px'; }
+window.ready = true;
+</script>
+</body>
+</html>
