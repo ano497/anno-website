@@ -10,6 +10,7 @@ import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js'
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+import { initHumans, realPerson, loadGLB } from './humans.js';
 
 export { THREE };
 export const W = 720, H = 1280, FPS = 30, DURATION = 60;
@@ -384,7 +385,8 @@ const DIR = `./eps/ep${EP}`;
 DATA = await (await fetch(`${DIR}.json`)).json();
 $('titlePov').innerHTML = DATA.title[0]; $('titleMain').innerHTML = DATA.title[1];
 const ep = await import(`${DIR}.js`);
-await ep.build({ skyMat, hemi, sun, renderer, city, THREE, scene, camera, defineSet, shot, mat, mesh, box, cyl, sphere, sign, textTex, terrain, water, person, crowd, car, tree, particles, rng, fbm, vnoise, clamp, lerp, smooth, ease, easeOut, DATA });
+const CLIPNAMES = ep.usesHumans ? await initHumans() : [];
+await ep.build({ realPerson, loadGLB, CLIPNAMES, skyMat, hemi, sun, renderer, city, THREE, scene, camera, defineSet, shot, mat, mesh, box, cyl, sphere, sign, textTex, terrain, water, person, crowd, car, tree, particles, rng, fbm, vnoise, clamp, lerp, smooth, ease, easeOut, DATA });
 SHOTS.sort((a, b) => a.t0 - b.t0);
 window.renderAt(0.5);
 window.sceneReady = true;

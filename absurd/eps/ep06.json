@@ -1,0 +1,29 @@
+{
+  "slug": "hotel-at-the-bottom-of-the-ocean",
+  "title": ["POV:", "A hotel opened at the<br>bottom of the ocean."],
+  "titleUntil": 3.2,
+  "labels": [[3.4, 9.4, "2034"], [21.6, 27.2, "MONTH 2"], [33.3, 39.4, "MONTH 5"], [46.1, 52.4, "YEAR 2"]],
+  "subs": [
+    [3.3, 6.8, "In 2034, LuxStay opened a hotel at the bottom of the ocean.", "In twenty thirty-four, LuxStay opened a hotel at the bottom of the ocean."],
+    [6.8, 9.6, "Eleven kilometers down."],
+    [9.6, 12.6, "Every room has an ocean view."],
+    [12.6, 15.4, "The elevator ride takes four hours."],
+    [15.4, 18.2, "So does room service."],
+    [18.3, 21.6, "The pool is on the roof. It's the ocean."],
+    [21.6, 24.6, "Guests said the windows were too dark."],
+    [24.6, 27.4, "So the hotel turned on the lights."],
+    [27.5, 30.4, "The lights attracted fish."],
+    [30.4, 33.2, "Then bigger fish."],
+    [33.3, 36.6, "Then a whale moved into the lobby."],
+    [36.6, 39.6, "He won't leave. He says he was here first."],
+    [39.7, 43.2, "The whale left a one-star review."],
+    [43.2, 46.0, "\"Too bright. Too many humans.\"", "Too bright. Too many humans."],
+    [46.1, 49.6, "Now fish book most of the rooms."],
+    [49.6, 52.6, "They pay in shells."],
+    [52.7, 56.0, "The hotel is now rated 4.9 stars.", "The hotel is now rated four point nine stars."],
+    [56.0, 59.2, "Humans are no longer allowed."]
+  ],
+  "amb": [[0, 6.8, "waves"], [6.8, 52.7, "underwater"], [52.7, 60, "waves"]],
+  "sfx": [[6.9, "splash"], [13.0, "ding"], [24.7, "thud"], [33.4, "rumble"], [40.0, "pop"], [50.0, "register"], [56.2, "thud"]],
+  "music": {"prog": "wonder"}
+}
