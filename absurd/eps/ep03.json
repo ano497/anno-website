@@ -1,0 +1,29 @@
+{
+  "slug": "the-ocean-got-a-paywall",
+  "title": ["POV:", "Someone bought<br>the ocean."],
+  "titleUntil": 3.2,
+  "labels": [[3.4, 9.0, "2030"], [20.4, 26.0, "MONTH 6"], [36.0, 41.5, "YEAR 2"]],
+  "subs": [
+    [3.3, 6.6, "In 2030, a company called BlueBay bought the ocean.", "In twenty thirty, a company called BlueBay bought the ocean."],
+    [6.6, 8.4, "All of it."],
+    [8.5, 11.2, "Beaches got turnstiles."],
+    [11.2, 14.4, "Swimming costs nine dollars an hour."],
+    [14.4, 17.0, "Waves are a premium feature."],
+    [17.0, 20.3, "Free users get the tide twice a day."],
+    [20.4, 23.4, "Ships now need a monthly plan."],
+    [23.4, 27.0, "A cruise ship was stuck for three weeks."],
+    [27.0, 29.6, "Its card was declined."],
+    [29.7, 33.0, "Then BlueBay noticed where rain comes from."],
+    [33.0, 35.8, "They sent everyone a bill."],
+    [35.9, 39.4, "People started carrying umbrellas indoors."],
+    [39.4, 42.0, "Just to be safe."],
+    [42.1, 45.6, "Lakes declared independence from the ocean."],
+    [45.6, 48.4, "BlueBay bought the lakes."],
+    [48.5, 52.0, "Today, one man still swims for free."],
+    [52.0, 55.2, "He found a loophole. He brings his own water.", "He found a loophole. He brings his own water."],
+    [55.3, 59.2, "BlueBay is suing him."]
+  ],
+  "amb": [[0, 20.3, "waves"], [8.5, 20.3, "crowd"], [20.4, 29.6, "water"], [29.7, 42, "rain"], [42.1, 48.4, "birds"], [48.5, 60, "waves"]],
+  "sfx": [[9.0, "beep"], [9.6, "click"], [15.0, "register"], [27.3, "beep"], [33.2, "register"], [45.8, "register"], [55.4, "thud"]],
+  "music": {"prog": "pop"}
+}

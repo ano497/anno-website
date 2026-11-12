@@ -1,0 +1,28 @@
+{
+  "slug": "megastore-grand-canyon",
+  "title": ["POV:", "A megastore opened<br>inside the Grand Canyon."],
+  "titleUntil": 3.2,
+  "labels": [[3.4, 9.0, "2031"], [20.8, 26.5, "MONTH 4"], [37.0, 42.5, "YEAR 2"], [43.4, 48.5, "YEAR 3"]],
+  "subs": [
+    [3.3, 8.0, "In 2031, MegaMart opened a store at the bottom of the Grand Canyon.", "In twenty thirty-one, MegaMart opened a store at the bottom of the Grand Canyon."],
+    [8.0, 10.6, "It was four million square feet."],
+    [10.6, 13.0, "It had one parking space."],
+    [13.0, 16.8, "Customers rode mules down. Seven hours each way."],
+    [16.8, 20.6, "It became the most visited store in America."],
+    [20.6, 23.5, "Then the other companies noticed."],
+    [23.5, 26.8, "BurgerTown opened a drive-through on Niagara Falls."],
+    [26.8, 30.0, "You order at the top. Your food arrives at the bottom."],
+    [30.1, 33.6, "PetroMax built a gas station on a geyser."],
+    [33.6, 36.8, "Free car wash every 90 minutes.", "Free car wash, every ninety minutes."],
+    [36.9, 40.5, "Then Mount Everest got a parking garage."],
+    [40.5, 43.2, "Nobody could ever find their car."],
+    [43.3, 47.0, "Scientists begged companies to leave one place untouched."],
+    [47.0, 49.2, "The companies agreed."],
+    [49.3, 52.6, "It's a single tree in Ohio."],
+    [52.6, 55.0, "It has a gift shop."],
+    [55.0, 57.1, "Tickets are $40.", "Tickets are forty dollars."],
+    [57.1, 59.3, "The tree is not included."]
+  ],
+  "amb": [[0, 23.5, "wind"], [8, 23.5, "crowd"], [23.5, 30.1, "falls"], [30.1, 36.9, "wind"], [36.9, 43.3, "mountain"], [43.3, 60, "birds"], [49.3, 60, "crowd"]],
+  "sfx": [[34.0, "geyser"], [10.7, "ding"], [27.2, "ding"], [55.1, "register"]]
+}

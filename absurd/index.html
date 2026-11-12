@@ -1,0 +1,38 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Absurd Documentary</title>
+<style>
+  html, body { margin: 0; padding: 0; background: #000; overflow: hidden; }
+  #stage { position: relative; width: 1080px; height: 1920px; overflow: hidden; }
+  canvas { display: block; }
+  .serif { font-family: 'DejaVu Serif', Georgia, serif; font-weight: 700; }
+  /* channel title style: gold tracked "POV:" + white serif */
+  #title { position: absolute; left: 60px; top: 285px; width: 960px; opacity: 0; }
+  #title .pov { color: #e0b65c; font-size: 66px; letter-spacing: 18px; text-shadow: 3px 4px 6px rgba(0,0,0,.6); }
+  #title .main { color: #fff; font-size: 76px; line-height: 1.12; margin-top: 10px;
+    text-shadow: 4px 5px 0 rgba(0,0,0,.55), 0 0 18px rgba(0,0,0,.45); }
+  #sub { position: absolute; left: 60px; right: 60px; top: 1215px; text-align: center;
+    color: #fff; font-size: 64px; line-height: 1.18;
+    text-shadow: 3px 4px 0 rgba(0,0,0,.75), 0 0 22px rgba(0,0,0,.9); }
+  /* documentary date chip */
+  #label { position: absolute; left: 60px; top: 300px; padding: 10px 26px; background: rgba(10,10,10,.72);
+    color: #e0b65c; font: bold 44px 'DejaVu Sans Mono', monospace; letter-spacing: 6px; border-left: 8px solid #e0b65c; opacity: 0; }
+  #end { position: absolute; left: 60px; right: 60px; top: 800px; text-align: center; color: #fff; font-size: 92px; line-height: 1.15; opacity: 0;
+    text-shadow: 4px 5px 0 rgba(0,0,0,.6), 0 0 30px rgba(0,0,0,.6); }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="title" class="serif"><div class="pov" id="titlePov"></div><div class="main" id="titleMain"></div></div>
+  <div id="label"></div>
+  <div id="sub" class="serif"></div>
+  <div id="end" class="serif"></div>
+</div>
+<script type="importmap">
+{ "imports": { "three": "./node_modules/three/build/three.module.js", "three/addons/": "./node_modules/three/examples/jsm/" } }
+</script>
+<script type="module" src="engine.js"></script>
+</body>
+</html>

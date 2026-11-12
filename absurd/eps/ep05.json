@@ -1,0 +1,29 @@
+{
+  "slug": "someone-trademarked-blue",
+  "title": ["POV:", "A company trademarked<br>the color blue."],
+  "titleUntil": 3.2,
+  "labels": [[3.4, 9.6, "2033"], [18.3, 24.2, "MONTH 3"], [40.3, 46.6, "YEAR 2"], [53.1, 58.8, "LAST WEEK"]],
+  "subs": [
+    [3.3, 6.8, "In 2033, a company trademarked the color blue.", "In twenty thirty-three, a company trademarked the color blue."],
+    [6.8, 9.8, "Every blue thing on Earth now needed a license."],
+    [9.8, 12.4, "Jeans turned grey."],
+    [12.4, 15.2, "Police uniforms turned beige."],
+    [15.2, 18.2, "Blueberries were renamed \"berries.\"", "Blueberries were renamed, berries."],
+    [18.3, 21.0, "Then the lawyers looked up."],
+    [21.0, 24.4, "The sky had been using blue without permission."],
+    [24.4, 27.6, "The city received a cease-and-desist letter."],
+    [27.7, 31.2, "Until the city paid, the sky had to be covered."],
+    [31.2, 34.0, "It took 4,000 blimps.", "It took four thousand blimps."],
+    [34.1, 37.4, "The ocean got a bill the same week."],
+    [37.4, 40.2, "It's still negotiating."],
+    [40.3, 43.8, "Then a rival company trademarked green."],
+    [43.8, 46.8, "Trees are now on a payment plan."],
+    [46.9, 50.4, "Nobody had trademarked grey."],
+    [50.4, 53.0, "So everything is grey now."],
+    [53.1, 56.4, "Last week, someone trademarked grey."],
+    [56.4, 59.2, "We have until Friday."]
+  ],
+  "amb": [[0, 34.1, "city"], [34.1, 40.2, "waves"], [40.3, 46.8, "birds"], [46.9, 60, "city"]],
+  "sfx": [[7.2, "beep"], [24.8, "thud"], [28.0, "rumble"], [34.4, "register"], [44.0, "register"], [53.3, "thud"]],
+  "music": {"prog": "pop"}
+}
