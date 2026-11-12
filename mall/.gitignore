@@ -5,3 +5,6 @@ audio.wav
 render.log
 narration.wav
 audio_vo.wav
+narration*.wav
+audio_vo*.wav
+sample*.wav

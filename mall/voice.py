@@ -4,11 +4,20 @@ the subtitle window. The sound-design bed is ducked under the voice.
 Usage: python3 voice.py <kokoro-dir>   (needs kokoro-v1.0.onnx + voices-v1.0.bin)
 Writes narration.wav and audio_vo.wav (bed + voice).
 """
-import sys, wave
+import argparse, os, subprocess, tempfile, wave
 import numpy as np
 from kokoro_onnx import Kokoro
 
-VOICE, BASE_SPEED = 'af_heart', 0.9
+ap = argparse.ArgumentParser()
+ap.add_argument('kdir')
+ap.add_argument('--voice', default='am_onyx')
+ap.add_argument('--speed', type=float, default=0.84)
+ap.add_argument('--pitch', type=float, default=-2.5, help='semitones')
+ap.add_argument('--room', type=float, default=0.55, help='echo amount 0..1')
+ap.add_argument('--tag', default='')
+ap.add_argument('--only', default='', help='comma list of line indexes (sampler)')
+args = ap.parse_args()
+VOICE, BASE_SPEED = args.voice, args.speed
 LINES = [  # start, end (subtitle window), text
     (3.35, 6.5, '23:58. The shutters came down.'),
     (6.6, 8.5, 'Then the lights went out.'),
@@ -33,8 +42,17 @@ LINES = [  # start, end (subtitle window), text
     (56.4, 59.1, 'Me. In the chair. And someone behind me.'),
 ]
 SR = 48000
-kdir = sys.argv[1]
-k = Kokoro(f'{kdir}/kokoro-v1.0.onnx', f'{kdir}/voices-v1.0.bin')
+k = Kokoro(f'{args.kdir}/kokoro-v1.0.onnx', f'{args.kdir}/voices-v1.0.bin')
+
+def pitch_shift(x, semis):
+    if abs(semis) < 0.01: return x
+    with tempfile.TemporaryDirectory() as d:
+        a, b = os.path.join(d, 'a.wav'), os.path.join(d, 'b.wav')
+        with wave.open(a, 'wb') as w:
+            w.setnchannels(1); w.setsampwidth(2); w.setframerate(SR); w.writeframes((np.clip(x, -1, 1) * 32767).astype(np.int16).tobytes())
+        subprocess.run(['ffmpeg', '-y', '-loglevel', 'error', '-i', a, '-af', f'rubberband=pitch={2 ** (semis / 12):.5f}:formant=preserved', b], check=True)
+        with wave.open(b) as w:
+            return np.frombuffer(w.readframes(w.getnframes()), np.int16).astype(np.float64) / 32768
 
 def resample(x, sr_in):
     n = int(len(x) * SR / sr_in)
@@ -46,23 +64,35 @@ def trim(x, thr=0.01):
 
 N = SR * 60
 vo = np.zeros(N)
-for a, b, text in LINES:
+only = [int(i) for i in args.only.split(',')] if args.only else None
+cursor = 0.0
+for li, (a, b, text) in enumerate(LINES):
+    if only is not None:
+        if li not in only: continue
+        a, b = cursor, cursor + 6.0  # sampler: lines back to back
     window = (b - a) - 0.15
     speed = BASE_SPEED
     for _ in range(6):
         s, sr = k.create(text, voice=VOICE, speed=speed, lang='en-us')
-        s = trim(resample(np.asarray(s, dtype=np.float64), sr))
+        s = trim(pitch_shift(resample(np.asarray(s, dtype=np.float64), sr), args.pitch))
         if len(s) / SR <= window or speed >= 1.35: break
         speed = min(1.35, speed * (len(s) / SR) / window * 1.02)
     i0 = int((a + 0.08) * SR)
     n = min(len(s), N - i0)
     vo[i0:i0 + n] += s[:n]
+    if only is not None: cursor = a + 0.08 + len(s) / SR + 0.7
     print(f'{a:5.2f}s speed {speed:.2f} dur {len(s)/SR:4.2f}s / window {window:4.2f}s  {text}')
 
 vo /= np.abs(vo).max()
 # gentle room so it sits in the mall: short early reflections
-for d, g in [(0.023, 0.18), (0.041, 0.12), (0.067, 0.08)]:
-    vo[int(d * SR):] += vo[:-int(d * SR)] * g
+rng = np.random.default_rng(3)
+ir_n = int(2.6 * SR)
+ir = rng.standard_normal(ir_n) * np.exp(-np.arange(ir_n) / SR / 0.7)
+ir = np.convolve(ir, np.ones(24) / 24, mode='same')  # darker tail
+ir /= np.sqrt(np.sum(ir ** 2))
+m = len(vo) + ir_n; nfft = 1 << (m - 1).bit_length()
+wet = np.fft.irfft(np.fft.rfft(vo, nfft) * np.fft.rfft(ir, nfft), nfft)[:len(vo)]
+vo = vo + wet * args.room * 0.6
 vo /= np.abs(vo).max()
 
 with wave.open('audio.wav') as w:
@@ -80,6 +110,7 @@ def write(name, x):
     if x.ndim == 1 or x.shape[1] == 1: x = np.repeat(x.reshape(-1, 1), 2, 1)
     with wave.open(name, 'wb') as w:
         w.setnchannels(2); w.setsampwidth(2); w.setframerate(SR); w.writeframes((x * 32767).astype(np.int16).tobytes())
-write('narration.wav', vo * 0.89)
-write('audio_vo.wav', mix)
-print('wrote narration.wav, audio_vo.wav')
+if only is not None:
+    end = int(min(N, (cursor + 1.5) * SR)); write(f'sample{args.tag}.wav', (vo / np.abs(vo).max() * 0.89)[:end]); print('wrote sample', args.tag)
+else:
+    write(f'narration{args.tag}.wav', vo * 0.89); write(f'audio_vo{args.tag}.wav', mix); print('wrote', args.tag)
