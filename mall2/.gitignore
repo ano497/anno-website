@@ -1,0 +1,12 @@
+node_modules/
+stills/
+segments/
+audio.wav
+render.log
+narration.wav
+audio_vo.wav
+narration*.wav
+audio_vo*.wav
+sample*.wav
+render.log
+part2_master.mp4
