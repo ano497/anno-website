@@ -2,3 +2,4 @@ node_modules/
 stills/
 segments/
 audio.wav
+render.log
