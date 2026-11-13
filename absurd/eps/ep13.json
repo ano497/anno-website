@@ -1,0 +1,26 @@
+{
+ "slug": "why-ship-bottoms-are-red",
+ "why": true,
+ "titleBox": "Why Ship Bottoms<br>Are Red",
+ "title": ["", ""],
+ "subs": [[0, 1, ""]],
+ "lines": [
+  "Ever wondered why the bottom of ships is red?",
+  "It's not for style.",
+  "Anything that sits in the ocean gets covered in life.",
+  "Barnacles, algae, mussels.",
+  "And a dirty hull drags through the water,",
+  "which burns a lot more fuel.",
+  "Hundreds of years ago, sailors found a trick.",
+  "They covered wooden hulls in copper sheets.",
+  "Copper is toxic to those critters, so they stay off.",
+  "Later, ships switched to paint with copper in it.",
+  "And that copper paint was usually red.",
+  "Today, it can be almost any color.",
+  "But red stuck around. Mostly out of tradition."
+ ],
+ "ambAll": ["waves"],
+ "ambLines": [[2, 6, "underwater"]],
+ "sfxLines": [[3, 0.1, "pop"], [3, 0.7, "pop"], [3, 1.3, "pop"], [5, 0.3, "register"], [7, 0.3, "thud"], [10, 0.4, "ding"]],
+ "music": {"prog": "wonder", "bpm": 100}
+}

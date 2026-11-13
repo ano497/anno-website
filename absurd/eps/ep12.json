@@ -1,0 +1,27 @@
+{
+ "slug": "why-tires-are-black",
+ "why": true,
+ "titleBox": "Why Tires<br>Are Black",
+ "title": ["", ""],
+ "subs": [[0, 1, ""]],
+ "lines": [
+  "Car tires used to be white.",
+  "Natural rubber is actually a milky white color.",
+  "But those first white tires wore out really fast.",
+  "Some barely lasted a few thousand miles.",
+  "Then tire makers started mixing in a black powder.",
+  "It's called carbon black. Basically super fine soot.",
+  "It makes the rubber way stronger,",
+  "helps it deal with heat,",
+  "and blocks the sunlight that cracks rubber.",
+  "Suddenly, tires lasted many times longer.",
+  "That's why every tire you see today is black.",
+  "And those fancy whitewall tires?",
+  "Just a thin white layer on the side.",
+  "Underneath, it's still black."
+ ],
+ "ambAll": ["room"],
+ "ambLines": [[9, 11, "traffic"]],
+ "sfxLines": [[2, 1.4, "pop"], [4, 0.6, "whoosh"], [6, 0.2, "thud"], [8, 0.3, "ding"], [13, 0.2, "pop"]],
+ "music": {"prog": "pop", "bpm": 100}
+}
