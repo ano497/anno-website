@@ -58,6 +58,8 @@ export async function build(K) {
   const fly = (t, stuck) => fleet.forEach((c, i) => { const u = c.userData; const x = stuck ? u.x : ((u.x + t * u.sp * u.dir + 300) % 600 + 600) % 600 - 300; c.position.set(x, u.y + Math.sin(t + i) * (stuck ? 0.6 : 1.2), u.z); c.rotation.z = stuck ? Math.sin(t * 0.8 + i) * 0.05 : 0; c.children.forEach((d) => { if (d.children.length > 4) d.children.forEach((r) => { if (r.geometry && r.geometry.type === 'CircleGeometry') r.rotation.z = t * 40; }); }); });
   const horns = brand(['STRIKE', 'DRONE DRIVERS UNION'], 16, 6, 0, 80, 60, sk, { bg: '#d9483b', border: '#ffffff' });
   const strikers = []; for (let i = 0; i < 12; i++) { const p = person({ rand: rng(700 + i), shirt: 0x12a38a }, sk); p.position.set(-10 + i * 1.8, 0.1, 40); p.rotation.y = Math.PI; if (i % 3 === 0) { cyl(0.04, 0.04, 2.6, 0x8a6a4a, 0.3, 0, 0, p); sign(['ON', 'STRIKE'], 1.2, 0.8, { bg: '#f5f1e6', fg: '#d9483b' }, 0.3, 2.8, -0.03, p).rotation.y = Math.PI; } strikers.push(p); }
+  const hero = carried(0xfff2c8, 0xd9483b); sk.add(hero);
+  const heroFly = (t) => { const x = -30 + (t - 6) * 7; hero.position.set(x, 104 + Math.sin(t * 1.3) * 0.6, 0); hero.rotation.z = Math.sin(t * 0.9) * 0.05; camera.position.set(x - 16, 98, 24); camera.lookAt(x, 97, 0); };
   // residents in a stuck house + mail helicopter
   const stuckHome = carried(0xf2d0c0, 0x6b4a2f); stuckHome.position.set(0, 120, 0); sk.add(stuckHome);
   const res = person({ shirt: 0xff8a3d }, stuckHome); res.position.set(1.9, -10 + 1.4, 2.7); res.pose({ armR: -2.6 });
@@ -67,11 +69,11 @@ export async function build(K) {
   const S = (set, i0, i1, o) => shot({ t0: T(i0), t1: i1 >= DATA.subs.length ? 999 : T(i1), set, focus: 0.5, band: 0.18, ...o });
   S('suburb', 0, 1, { from: [-14, 4, 30], to: [-12, 4, 27], look: [-9, 6, 8], fov: 52, update: () => { inbound.visible = false; } });
   S('suburb', 1, 2, { from: [0, 3, 30], to: [0, 3.2, 27], look: [0, 3, 13], fov: 52, update: () => { inbound.visible = false; fam.forEach((p) => p.pose({ head: -0.2 })); } });
-  S('skyline', 2, 4, { from: [40, 110, 160], to: [20, 115, 120], look: [0, 105, 0], fov: 50, update: (t) => fly(t, false) });
+  S('skyline', 2, 4, { from: [0, 0, 0], look: [0, 0, 0], fov: 52, update: (t) => { fly(t, false); horns.visible = false; stuckHome.visible = false; hero.visible = true; heroFly(t); } });
   S('suburb', 4, 5, { from: [36, 3, 34], to: [34, 3, 31], look: [28, 4, 14], fov: 50, update: () => { inbound.visible = false; } });
   S('suburb', 5, 7, { from: [-30, 5, 34], to: [-33, 4.5, 30], look: [-42, 3, -2], fov: 52, update: (t) => { inbound.visible = true; const k = smooth(T(5), T(6) + 0.8, t); inbound.position.set(-42, lerp(40, 10.3, k), -5 + 0); fam.forEach((p) => p.pose({ head: 0 })); } });
   S('suburb', 7, 8, { from: [-30.5, 3.4, 10], to: [-31, 3.4, 9.2], look: [-38, 4.6, 1.5], fov: 50, update: () => { inbound.position.set(-42, 10.3, -5); } });
-  S('skyline', 8, 9, { from: [10, 3, 56], to: [8, 3.2, 52], look: [0, 4, 40], lookTo: [0, 30, 0], fov: 52, update: (t) => fly(t, true) });
-  S('skyline', 9, 10, { from: [40, 128, 80], to: [50, 135, 100], look: [0, 112, 0], fov: 52, update: (t) => fly(t, true) });
-  S('skyline', 10, 99, { from: [12, 118, 22], to: [10, 117, 18], look: [0, 112, 0], fov: 50, update: (t) => { fly(t, true); stuckHome.position.y = 120 + Math.sin(t) * 0.5; } });
+  S('skyline', 8, 9, { from: [10, 3, 56], to: [8, 3.2, 52], look: [0, 4, 40], lookTo: [0, 30, 0], fov: 52, update: (t) => { fly(t, true); horns.visible = true; stuckHome.visible = false; hero.visible = false; } });
+  S('skyline', 9, 10, { from: [40, 128, 80], to: [50, 135, 100], look: [0, 112, 0], fov: 52, update: (t) => { fly(t, true); horns.visible = false; stuckHome.visible = true; hero.visible = false; } });
+  S('skyline', 10, 99, { from: [12, 118, 22], to: [10, 117, 18], look: [0, 112, 0], fov: 50, update: (t) => { fly(t, true); horns.visible = false; stuckHome.visible = true; hero.visible = false; stuckHome.position.y = 120 + Math.sin(t) * 0.5; } });
 }

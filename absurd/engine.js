@@ -576,7 +576,7 @@ window.renderAt = (v) => {
     if (FAST.style === 'retain') {
       const shotLen = Math.max(0.5, Math.min(toVideo(s.t1), window.DURATION) - cutV); const uu = clamp((v - cutV) / shotLen);
       fovMul = (1 + 0.07 * (1 - easeOut(clamp((v - cutV) / 0.2)))) * (1 - 0.08 * uu);
-      const since = v - cutV; grade.uniforms.uTint.value = since < 0.07 ? 0.3 * (1 - since / 0.07) : 0; grade.uniforms.uTintC.value.set(1, 1, 1);
+      const since = v - cutV; grade.uniforms.uTint.value = since < 0.07 && cutV > 0.01 ? 0.3 * (1 - since / 0.07) : 0; grade.uniforms.uTintC.value.set(1, 1, 1);
     }
     if (FAST.style === 'tiktok') {
       const seg = Math.floor((v - cutV) / 0.62); fovMul = [1, 0.8, 0.9, 0.74][seg % 4];  // hard punch-in jump cuts
@@ -586,7 +586,7 @@ window.renderAt = (v) => {
       grade.uniforms.uTintC.value.set(...tint); grade.uniforms.uTint.value = amt;
     }
     for (const i of FAST.punch || []) { const vs = toVideo(DATA.subs[i][0]); if (v >= vs) { const p = Math.exp(-(v - vs) * 5); fovMul *= 1 - 0.1 * p; shake = Math.max(shake, p); flash = Math.max(flash, 0.45 * Math.exp(-(v - vs) * 16)); } }
-    if (v < 0.12) flash = Math.max(flash, 0.6 * (1 - v / 0.12));
+    if (v < 0.12 && FAST.style !== 'retain') flash = Math.max(flash, 0.6 * (1 - v / 0.12));
     if (FAST.style === 'why') { fovMul = 1; shake = 0; flash = 0; }
     camera.fov *= fovMul; camera.updateProjectionMatrix();
     if (shake > 0.02) { camera.rotateZ(Math.sin(v * 71) * 0.025 * shake); camera.rotateX(Math.sin(v * 53) * 0.012 * shake); }
