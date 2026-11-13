@@ -10,17 +10,46 @@ from kokoro_onnx import Kokoro
 ap = argparse.ArgumentParser(); ap.add_argument('ep'); ap.add_argument('kdir')
 ap.add_argument('--voice', default='bm_george'); ap.add_argument('--speed', type=float, default=1.0)
 ap.add_argument('--sample', action='store_true', help='only write the first 4 lines back to back')
+ap.add_argument('--fast', action='store_true', help='fast edit: hook line + sped-up timeline, writes narration + timing json')
 a = ap.parse_args()
 D = json.load(open(f'eps/ep{a.ep}.json'))
 SR = 48000; N = SR * 60
 k = Kokoro(f'{a.kdir}/kokoro-v1.0.onnx', f'{a.kdir}/voices-v1.0.bin')
 lang = 'en-gb' if a.voice.startswith('b') else 'en-us'
 
+
 def resample(x, sr_in):
     n = int(len(x) * SR / sr_in); return np.interp(np.linspace(0, len(x) - 1, n), np.arange(len(x)), x)
 def trim(x, thr=0.01):
     nz = np.where(np.abs(x) > thr)[0]; return x[max(0, nz[0] - 480): nz[-1] + 2400] if len(nz) else x
 
+if a.fast:
+    import wave as _w
+    F = D['fast']; K = F['K']; S0 = D.get('titleUntil', 3.2)
+    def say(text, maxdur, speed0):
+        sp = speed0
+        for _ in range(6):
+            x, sr = k.create(text, voice=a.voice, speed=sp, lang=lang); x = trim(resample(np.asarray(x, dtype=np.float64), sr))
+            if len(x) / SR <= maxdur or sp >= 1.55: break
+            sp = min(1.55, sp * (len(x) / SR) / maxdur * 1.02)
+        return x, sp
+    hx, _ = say(F['hook']['say'], 3.2, a.speed)
+    H = max(F['hook']['dur'], len(hx) / SR + 0.25)
+    tv = lambda t: H + (t - S0) / K
+    DUR = tv(D['subs'][-1][1]) + 0.25
+    N2 = int(SR * (DUR + 1)); vo = np.zeros(N2); vo[int(0.08 * SR):int(0.08 * SR) + len(hx)] += hx
+    lines = []
+    for s_ in D['subs']:
+        t0, t1 = tv(s_[0]), tv(s_[1]); text = s_[3] if len(s_) > 3 else re.sub(r'<[^>]+>', ' ', s_[2])
+        x, sp = say(text, (t1 - t0) - 0.06, a.speed)
+        i0 = int((t0 + 0.03) * SR); vo[i0:i0 + len(x)] += x[:N2 - i0]
+        lines.append({'start': round(t0 + 0.03, 3), 'dur': round(len(x) / SR, 3), 'text': s_[2]})
+        print(f'{t0:5.2f}s speed {sp:.2f} dur {len(x)/SR:4.2f}s / {t1-t0:4.2f}s  {text}')
+    vo = vo[:int(SR * DUR)]; vo = vo / np.abs(vo).max() * 0.95
+    with _w.open(f'eps/out/ep{a.ep}_narr.wav', 'wb') as w:
+        w.setnchannels(1); w.setsampwidth(2); w.setframerate(SR); w.writeframes((vo * 32767).astype(np.int16).tobytes())
+    json.dump({'hookDur': H, 'dur': DUR, 'lines': lines}, open(f'eps/out/ep{a.ep}_vo.json', 'w'))
+    print('fast narration', a.ep, f'{DUR:.1f}s'); raise SystemExit
 vo = np.zeros(N); cursor = 0.0
 subs = D['subs'][:4] if a.sample else D['subs']
 for s in subs:

@@ -21,6 +21,14 @@
     color: #e0b65c; font: bold 44px 'DejaVu Sans Mono', monospace; letter-spacing: 6px; border-left: 8px solid #e0b65c; opacity: 0; }
   #end { position: absolute; left: 60px; right: 60px; top: 800px; text-align: center; color: #fff; font-size: 92px; line-height: 1.15; opacity: 0;
     text-shadow: 4px 5px 0 rgba(0,0,0,.6), 0 0 30px rgba(0,0,0,.6); }
+  #hook { position: absolute; left: 50px; right: 50px; top: 300px; text-align: center; opacity: 0; transform-origin: 50% 50%;
+    font: 900 92px/1.08 'DejaVu Sans', sans-serif; color: #fff; text-transform: uppercase; letter-spacing: -1px;
+    -webkit-text-stroke: 10px #000; paint-order: stroke fill; text-shadow: 0 8px 0 rgba(0,0,0,.55); }
+  #hook b { color: #ffd23f; }
+  #cap { position: absolute; left: 50%; top: 1130px; width: 980px; text-align: center; opacity: 0; transform-origin: 50% 50%;
+    font: 900 104px/1.05 'DejaVu Sans', sans-serif; color: #fff; text-transform: uppercase; letter-spacing: -1px;
+    -webkit-text-stroke: 12px #000; paint-order: stroke fill; text-shadow: 0 9px 0 rgba(0,0,0,.6); }
+  #cap .on { color: #ffd23f; }
 </style>
 </head>
 <body>
@@ -28,6 +36,8 @@
   <div id="title" class="serif"><div class="pov" id="titlePov"></div><div class="main" id="titleMain"></div></div>
   <div id="label"></div>
   <div id="sub" class="serif"></div>
+  <div id="hook"></div>
+  <div id="cap"></div>
   <div id="end" class="serif"></div>
 </div>
 <script type="importmap">

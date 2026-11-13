@@ -454,24 +454,75 @@ function runShot(s, t) {
   grade.uniforms.uTilt.value = s.tilt ?? c.tilt ?? 0.7; grade.uniforms.uSat.value = typeof s.sat === 'function' ? s.sat(t) : (s.sat ?? c.sat ?? 1.18); grade.uniforms.uFocus.value = s.focus ?? 0.5; grade.uniforms.uBand.value = s.band ?? 0.1;
   sky.position.copy(camera.position);
 }
-window.DURATION = DURATION; window.FPS = FPS;
-window.renderAt = (t) => {
+window.FPS = FPS;
+// ---- "fast" edit mode: hook flash-forward, sped-up story, word captions, snap zooms ----
+let FAST = null, VO = null;
+const S0 = () => DATA.titleUntil ?? 3.2;
+const toScene = (v) => v < FAST.H ? FAST.hook.t + v * 0.5 : S0() + (v - FAST.H) * FAST.K;
+const toVideo = (t) => FAST.H + (t - S0()) / FAST.K;
+function capWords(v) {
+  // current subtitle + word timing (from the voice track if available, else estimated)
+  const lines = VO || DATA.subs.map((x) => ({ start: toVideo(x[0]) + 0.06, dur: (x[1] - x[0]) / FAST.K * 0.88, text: x[2] }));
+  const all = FAST.hook.say ? [{ start: 0.08, dur: FAST.H - 0.25, text: FAST.hook.say }, ...lines] : lines;
+  let cur = null; for (const l of all) if (v >= l.start - 0.05 && v < l.start + l.dur + 0.35) cur = l;
+  if (!cur) return null;
+  const words = cur.text.replace(/<[^>]+>/g, ' ').split(/\s+/).filter(Boolean);
+  const w = words.map((x) => x.length + 2), tot = w.reduce((p, c) => p + c, 0);
+  let acc = 0; const times = w.map((x) => { const t0 = cur.start + acc / tot * cur.dur; acc += x; return t0; });
+  let wi = 0; times.forEach((t0, i) => { if (v >= t0) wi = i; });
+  // chunks of up to 3 words / 16 chars
+  const chunks = []; let c = [];
+  words.forEach((x, i) => { if (c.length && (c.length >= 3 || c.map((k) => words[k]).join(' ').length + x.length > 16)) { chunks.push(c); c = []; } c.push(i); });
+  if (c.length) chunks.push(c);
+  const ch = chunks.find((k) => k.includes(wi));
+  return { html: ch.map((k) => `<span class="${k === wi ? 'on' : ''}">${words[k]}</span>`).join(' '), since: v - times[ch[0]] };
+}
+function fastOverlays(v) {
+  $('title').style.opacity = '0'; $('sub').style.opacity = '0';
+  const hk = $('hook'); hk.innerHTML = FAST.hook.text; hk.style.opacity = v < FAST.H ? '1' : '0';
+  hk.style.transform = `scale(${1 + 0.12 * Math.exp(-v * 7)})`;
+  const cw = capWords(v); const ce = $('cap');
+  if (cw && v >= FAST.H - 0.02 || (cw && !FAST.hook.text)) { ce.innerHTML = cw.html; ce.style.opacity = '1'; ce.style.transform = `translateX(-50%) scale(${1 + 0.18 * Math.exp(-cw.since * 18)})`; } else ce.style.opacity = '0';
+  const t = toScene(v);
+  const lab = v >= FAST.H && (DATA.labels || []).find(([a, b]) => t >= a && t < b);
+  const le = $('label'); le.textContent = lab ? lab[2] : ''; le.style.opacity = lab ? '1' : '0';
+}
+window.renderAt = (v) => {
+  const t = FAST ? toScene(v) : v;
   const s = SHOTS.find((x) => t >= x.t0 && t < x.t1) || SHOTS[SHOTS.length - 1];
   runShot(s, t);
-  const fe = DATA.fadeOut ?? 59.2;
-  grade.uniforms.uFade.value = Math.max(clamp(1 - t / 0.4), clamp((t - fe) / 0.6), s.fade ? s.fade(t) : 0);
-  grade.uniforms.uFlash.value = s.flash ? s.flash(t) : 0;
-  grade.uniforms.uSeed.value = (t * 30) % 97;
-  overlays(t);
+  if (FAST) {
+    const cutV = v < FAST.H ? 0 : Math.max(FAST.H, toVideo(s.t0));
+    const k = clamp((v - cutV) / 0.24); let fovMul = 1 + 0.16 * (1 - easeOut(k)), shake = 0, flash = 0;
+    for (const i of FAST.punch || []) { const vs = toVideo(DATA.subs[i][0]); if (v >= vs) { const p = Math.exp(-(v - vs) * 5); fovMul *= 1 - 0.1 * p; shake = Math.max(shake, p); flash = Math.max(flash, 0.45 * Math.exp(-(v - vs) * 16)); } }
+    if (v < 0.12) flash = Math.max(flash, 0.6 * (1 - v / 0.12));
+    camera.fov *= fovMul; camera.updateProjectionMatrix();
+    if (shake > 0.02) { camera.rotateZ(Math.sin(v * 71) * 0.025 * shake); camera.rotateX(Math.sin(v * 53) * 0.012 * shake); }
+    grade.uniforms.uFade.value = 0; grade.uniforms.uFlash.value = Math.max(flash, s.flash ? s.flash(t) : 0);
+    grade.uniforms.uSat.value *= 1.12;
+    fastOverlays(v);
+  } else {
+    const fe = DATA.fadeOut ?? 59.2;
+    grade.uniforms.uFade.value = Math.max(clamp(1 - t / 0.4), clamp((t - fe) / 0.6), s.fade ? s.fade(t) : 0);
+    grade.uniforms.uFlash.value = s.flash ? s.flash(t) : 0;
+    overlays(t);
+  }
+  grade.uniforms.uSeed.value = (v * 30) % 97;
   composer.render();
 };
 
 const DIR = `./eps/ep${EP}`;
 DATA = await (await fetch(`${DIR}.json`)).json();
 $('titlePov').innerHTML = DATA.title[0]; $('titleMain').innerHTML = DATA.title[1];
+if (DATA.fast) {
+  FAST = { ...DATA.fast }; FAST.H = FAST.hook.dur;
+  try { const r = await fetch(`./eps/out/ep${EP}_vo.json`); if (r.ok) { const j = await r.json(); VO = j.lines; if (j.hookDur) FAST.H = j.hookDur; } } catch (e) {}
+  const last = DATA.subs[DATA.subs.length - 1];
+  window.DURATION = Math.ceil((toVideo(last[1]) + 0.25) * FPS) / FPS;
+} else window.DURATION = DURATION;
 const ep = await import(`${DIR}.js`);
 const CLIPNAMES = ep.usesHumans ? await initHumans() : [];
 await ep.build({ carsInstanced, realPerson, loadGLB, CLIPNAMES, skyMat, hemi, sun, renderer, city, THREE, scene, camera, defineSet, shot, mat, mesh, box, cyl, sphere, sign, textTex, terrain, water, person, crowd, car, tree, particles, rng, fbm, vnoise, clamp, lerp, smooth, ease, easeOut, DATA });
 SHOTS.sort((a, b) => a.t0 - b.t0);
-window.renderAt(0.5);
+window.renderAt(FAST ? FAST.H + 0.5 : 0.5);
 window.sceneReady = true;

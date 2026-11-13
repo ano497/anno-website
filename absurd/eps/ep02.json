@@ -1,29 +1,198 @@
 {
-  "slug": "billionaire-bought-the-moon",
-  "title": ["POV:", "A billionaire bought<br>the Moon."],
-  "titleUntil": 3.2,
-  "labels": [[3.4, 9.5, "2029"], [18.3, 24.2, "MONTH 2"], [30.1, 36.4, "YEAR 2"], [42.7, 48.5, "YEAR 4"]],
-  "subs": [
-    [3.3, 7.2, "In 2029, a billionaire bought the Moon at an auction.", "In twenty twenty-nine, a billionaire bought the Moon at an auction."],
-    [7.2, 10.0, "Nobody else bid. Nobody knew it was for sale."],
-    [10.0, 13.2, "The first thing he did was put an ad on it."],
-    [13.2, 16.0, "It could be seen from every country on Earth."],
-    [16.0, 18.2, "At night."],
-    [18.3, 21.6, "People complained. So the ad changed every hour."],
-    [21.6, 24.4, "Full moons now cost extra."],
-    [24.5, 27.6, "Werewolf groups filed a lawsuit."],
-    [27.6, 30.0, "They lost."],
-    [30.1, 33.6, "Then a rival company bought the stars."],
-    [33.6, 36.6, "The Big Dipper was renamed The Big Deal."],
-    [36.7, 40.0, "Astronomers now pay a subscription to see space."],
-    [40.0, 42.6, "Free users get one star."],
-    [42.7, 46.6, "Last week, there was a solar eclipse."],
-    [46.6, 50.0, "The Moon blocked the Sun for three whole minutes."],
-    [50.0, 52.6, "It was an unskippable ad."],
-    [52.7, 55.8, "Scientists say the Moon is slowly drifting away from Earth."],
-    [55.8, 59.2, "Honestly, nobody blames it."]
+ "slug": "billionaire-bought-the-moon",
+ "title": [
+  "POV:",
+  "A billionaire bought<br>the Moon."
+ ],
+ "titleUntil": 3.2,
+ "labels": [
+  [
+   3.4,
+   9.5,
+   "2029"
   ],
-  "amb": [[0, 10, "room"], [10, 30.1, "night"], [10, 30.1, "city"], [30.1, 42.7, "night"], [42.7, 52.7, "city"]],
-  "sfx": [[8.4, "thud"], [9.2, "thud"], [19.6, "pop"], [28.0, "thud"], [42.0, "beep"], [46.8, "boom"], [52.7, "whoosh"]],
-  "music": {"prog": "wonder"}
+  [
+   18.3,
+   24.2,
+   "MONTH 2"
+  ],
+  [
+   30.1,
+   36.4,
+   "YEAR 2"
+  ],
+  [
+   42.7,
+   48.5,
+   "YEAR 4"
+  ]
+ ],
+ "subs": [
+  [
+   3.3,
+   7.2,
+   "In 2029, a billionaire bought the Moon at an auction.",
+   "In twenty twenty-nine, a billionaire bought the Moon at an auction."
+  ],
+  [
+   7.2,
+   10.0,
+   "Nobody else bid. Nobody knew it was for sale."
+  ],
+  [
+   10.0,
+   13.2,
+   "The first thing he did was put an ad on it."
+  ],
+  [
+   13.2,
+   16.0,
+   "It could be seen from every country on Earth."
+  ],
+  [
+   16.0,
+   18.2,
+   "At night."
+  ],
+  [
+   18.3,
+   21.6,
+   "People complained. So the ad changed every hour."
+  ],
+  [
+   21.6,
+   24.4,
+   "Full moons now cost extra."
+  ],
+  [
+   24.5,
+   27.6,
+   "Werewolf groups filed a lawsuit."
+  ],
+  [
+   27.6,
+   30.0,
+   "They lost."
+  ],
+  [
+   30.1,
+   33.6,
+   "Then a rival company bought the stars."
+  ],
+  [
+   33.6,
+   36.6,
+   "The Big Dipper was renamed The Big Deal."
+  ],
+  [
+   36.7,
+   40.0,
+   "Astronomers now pay a subscription to see space."
+  ],
+  [
+   40.0,
+   42.6,
+   "Free users get one star."
+  ],
+  [
+   42.7,
+   46.6,
+   "Last week, there was a solar eclipse."
+  ],
+  [
+   46.6,
+   50.0,
+   "The Moon blocked the Sun for three whole minutes."
+  ],
+  [
+   50.0,
+   52.6,
+   "It was an unskippable ad."
+  ],
+  [
+   52.7,
+   55.8,
+   "Scientists say the Moon is slowly drifting away from Earth."
+  ],
+  [
+   55.8,
+   59.2,
+   "Honestly, nobody blames it."
+  ]
+ ],
+ "amb": [
+  [
+   0,
+   10,
+   "room"
+  ],
+  [
+   10,
+   30.1,
+   "night"
+  ],
+  [
+   10,
+   30.1,
+   "city"
+  ],
+  [
+   30.1,
+   42.7,
+   "night"
+  ],
+  [
+   42.7,
+   52.7,
+   "city"
+  ]
+ ],
+ "sfx": [
+  [
+   8.4,
+   "thud"
+  ],
+  [
+   9.2,
+   "thud"
+  ],
+  [
+   19.6,
+   "pop"
+  ],
+  [
+   28.0,
+   "thud"
+  ],
+  [
+   42.0,
+   "beep"
+  ],
+  [
+   46.8,
+   "boom"
+  ],
+  [
+   52.7,
+   "whoosh"
+  ]
+ ],
+ "music": {
+  "prog": "wonder"
+ },
+ "fast": {
+  "K": 1.38,
+  "hook": {
+   "t": 49.0,
+   "dur": 2.4,
+   "text": "The Moon is now an <b>ad</b>",
+   "say": "Someone bought the Moon. And then it got worse."
+  },
+  "punch": [
+   4,
+   8,
+   15,
+   17
+  ]
+ }
 }

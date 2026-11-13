@@ -6,9 +6,19 @@ optional "music": {"key": semitones from C, "prog": "pop"|"wonder"|"minor", "bpm
 import json, sys, wave, os
 import numpy as np
 
-SR = 48000; DUR = 60.0; N = int(SR * DUR)
+SR = 48000; DUR = 60.0
 ep = sys.argv[1]
 D = json.load(open(f'eps/ep{ep}.json'))
+FAST = D.get('fast'); VOJ = None
+if FAST:  # fast edit: timings follow the voice track written by voice.py --fast
+    VOJ = json.load(open(f'eps/out/ep{ep}_vo.json')); DUR = VOJ['dur']
+    _H, _K, _S0 = VOJ['hookDur'], FAST['K'], D.get('titleUntil', 3.2)
+    tv = lambda x: _H + (x - _S0) / _K if x >= _S0 else x * _H / _S0
+    D['amb'] = [[tv(a), tv(b), k] for a, b, k in D.get('amb', [])]
+    D['sfx'] = [[tv(a), k] for a, k in D.get('sfx', [])] + [[l['start'] - 0.12, 'whoosh2'] for l in VOJ['lines']] + [[0.0, 'boom'], [_H - 0.05, 'riser_hit']] + [[tv(D['subs'][i][0]), 'boom'] for i in FAST.get('punch', [])]
+    D['fadeOut'] = DUR + 5
+    D.setdefault('music', {})['bpm'] = 122
+N = int(SR * DUR)
 rng = np.random.default_rng(int(ep) * 7 + 1)
 t = np.arange(N) / SR
 
@@ -67,11 +77,29 @@ for bi in range(nbars):
         add(pluck(hz(n), 0.9, 0.8), t0 + k * beat / 2, [-0.4, 0.4][k % 2], 0.09 if k % 2 else 0.12)
     if bi % 2 == 1:  # little glockenspiel answer every other bar
         add(pluck(hz(ch[-1] + 12), 1.6, 1.5) * 0.7, t0 + beat * 3.5, 0.3, 0.07)
+if FAST:
+    def kick():
+        n = int(0.35 * SR); tt = np.arange(n) / SR
+        return np.sin(2 * np.pi * (50 + 110 * np.exp(-tt * 30)) * tt) * np.exp(-tt * 9) * 1.0
+    def snare():
+        n = int(0.25 * SR); tt = np.arange(n) / SR
+        return (spec_filter(noise(n), 1200, 8000) * 0.8 + np.sin(2 * np.pi * 190 * tt) * 0.4) * np.exp(-tt * 18)
+    def hat():
+        n = int(0.06 * SR); tt = np.arange(n) / SR
+        return spec_filter(noise(n), 7000, 16000) * np.exp(-tt * 70) * 0.5
+    K1, S1, HH = kick(), snare(), hat()
+    nb = int(DUR / beat) + 1
+    for b in range(nb):
+        tb = b * beat
+        if tb < 0.0: continue
+        add(K1, tb, 0, 0.55 if b % 2 == 0 else 0.4)
+        if b % 2 == 1: add(S1, tb, 0, 0.32)
+        add(HH, tb + beat / 2, 0.3, 0.18); add(HH, tb, -0.3, 0.1)
 music = spec_filter(music[:, 0], hi=7000)[:, None] * [1, 0] + spec_filter(music[:, 1], hi=7000)[:, None] * [0, 1]
 music = norm(music, 0.5)
 # music sits back during the cold open, swells slightly in the last bar, cut at fadeOut
 fo = D.get('fadeOut', 59.2)
-menv = np.clip(t / 2.0, 0, 1) * np.clip((fo + 0.6 - t) / 1.2, 0, 1)
+menv = (np.ones_like(t) if FAST else np.clip(t / 2.0, 0, 1)) * np.clip((fo + 0.6 - t) / 1.2, 0, 1)
 music *= menv[:, None]
 
 # ---------------- ambiences ----------------
@@ -150,6 +178,12 @@ def sfx(kind):
         for _ in range(20):
             f0 = rng.uniform(400, 1100); s += spec_filter(noise(n), f0 * 0.8, f0 * 1.3) * (0.6 + 0.4 * np.sin(2 * np.pi * rng.uniform(3, 7) * tt))
         return norm(s) * np.minimum(1, tt / 0.3) * np.exp(-tt * 0.7) * 0.6
+    if kind == 'whoosh2':
+        n = int(0.35 * SR); tt = np.arange(n) / SR
+        return spec_filter(noise(n), 500, 6000) * np.sin(np.pi * tt / 0.35) ** 2 * 0.28
+    if kind == 'riser_hit':
+        n = int(1.0 * SR); tt = np.arange(n) / SR
+        return (spec_filter(noise(n), 40, 200) * 2.5 + np.sin(2 * np.pi * 55 * tt)) * np.exp(-tt * 4) * 0.7
     if kind == 'thud':
         n = int(0.8 * SR); tt = np.arange(n) / SR
         return (np.sin(2 * np.pi * 60 * tt) + spec_filter(noise(n), 30, 300) * 2) * np.exp(-tt * 9) * 0.8
@@ -161,8 +195,18 @@ for t0, kind in D.get('sfx', []):
     s = sfx(kind); a = int(t0 * SR); b = min(N, a + len(s))
     bed[a:b, 0] += s[:b - a]; bed[a:b, 1] += s[:b - a]
 
-out = norm(bed, 0.55) + music
+out = norm(bed, 0.55) + music * (1.25 if FAST else 1)
 out = norm(out, 0.89)
+if FAST:  # mix the narration in, with a light duck
+    with wave.open(f'eps/out/ep{ep}_narr.wav') as w:
+        vo = np.frombuffer(w.readframes(w.getnframes()), np.int16).astype(np.float64) / 32768
+    vo = vo[:N] if len(vo) >= N else np.pad(vo, (0, N - len(vo)))
+    envl = np.convolve(np.abs(vo), np.ones(4800) / 4800, mode='same')
+    duck = 1 - 0.45 * np.clip(envl / (envl.max() * 0.15), 0, 1); duck = np.convolve(duck, np.ones(4800) / 4800, mode='same')
+    out = out * duck[:, None] * 0.75 + vo[:, None] * 0.8
+    out = norm(out, 0.89)
+    with wave.open(f'eps/out/ep{ep}_mix.wav', 'wb') as w:
+        w.setnchannels(2); w.setsampwidth(2); w.setframerate(SR); w.writeframes((out * 32767).astype(np.int16).tobytes())
 os.makedirs('eps/out', exist_ok=True)
 with wave.open(f'eps/out/ep{ep}_bed.wav', 'wb') as w:
     w.setnchannels(2); w.setsampwidth(2); w.setframerate(SR); w.writeframes((out * 32767).astype(np.int16).tobytes())
