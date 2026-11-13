@@ -54,7 +54,7 @@ if a.fast:
     hx, _ = say(F['hook']['say'], 3.2, a.speed)
     H = max(F['hook']['dur'], len(hx) / SR + 0.25)
     tv = lambda t: H + (t - S0) / K
-    DUR = tv(D['subs'][-1][1]) + 0.25
+    DUR = tv(D['subs'][-1][1]) + 0.25 + F.get('endCard', {}).get('dur', 0)
     N2 = int(SR * (DUR + 1)); vo = np.zeros(N2); vo[int(0.08 * SR):int(0.08 * SR) + len(hx)] += hx
     lines = []
     for s_ in D['subs']:

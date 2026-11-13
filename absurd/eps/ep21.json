@@ -1,0 +1,119 @@
+{
+ "slug": "airlines-charge-for-oxygen",
+ "title": [
+  "",
+  ""
+ ],
+ "titleUntil": 0,
+ "subs": [
+  [
+   0.0,
+   3.6,
+   "In 2032, SkyLow cut plane tickets to one dollar.",
+   "In twenty thirty-two, SkyLow cut plane tickets to one dollar."
+  ],
+  [
+   3.6,
+   5.22,
+   "Then came the fees."
+  ],
+  [
+   5.22,
+   7.5,
+   "Seats cost extra. So did seatbelts."
+  ],
+  [
+   7.5,
+   9.45,
+   "Window views were nine dollars."
+  ],
+  [
+   9.45,
+   12.39,
+   "Free users got a picture of a window."
+  ],
+  [
+   12.39,
+   15.33,
+   "At thirty thousand feet, the oxygen masks dropped."
+  ],
+  [
+   15.33,
+   17.61,
+   "Each one had a card reader."
+  ],
+  [
+   17.61,
+   19.89,
+   "Premium oxygen: four dollars a minute."
+  ],
+  [
+   19.89,
+   22.5,
+   "Passengers held their breath to save money."
+  ],
+  [
+   22.5,
+   24.45,
+   "Then someone asked about landing."
+  ],
+  [
+   24.45,
+   26.07,
+   "The pilot came out."
+  ],
+  [
+   26.07,
+   28.02,
+   "Landing is a premium feature."
+  ],
+  [
+   28.02,
+   28.98,
+   "Everyone paid."
+  ],
+  [
+   28.98,
+   30.27,
+   "Except one man."
+  ],
+  [
+   30.27,
+   31.89,
+   "He's still up there."
+  ]
+ ],
+ "labels": [],
+ "fast": {
+  "K": 1,
+  "style": "retain",
+  "hook": {
+   "t": 14.5,
+   "dur": 2.2,
+   "text": "AIRLINES NOW CHARGE FOR <b>OXYGEN</b>",
+   "say": "Airlines found a new fee. It's the worst one yet."
+  },
+  "punch": [
+   4,
+   8,
+   11,
+   14
+  ],
+  "endCard": {
+   "text": "WHAT FEE IS NEXT? 👇",
+   "dur": 1.8
+  }
+ },
+ "amb": [
+  [
+   0.0,
+   60,
+   "room"
+  ]
+ ],
+ "sfx": [],
+ "music": {
+  "prog": "pop",
+  "bpm": 124
+ }
+}

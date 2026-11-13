@@ -546,7 +546,7 @@ function capWords(v) {
   let wi = 0; times.forEach((t0, i) => { if (v >= t0) wi = i; });
   // chunks of up to 3 words / 16 chars
   const chunks = []; let c = [];
-  const TT = FAST.style === 'tiktok' || FAST.style === 'why';
+  const TT = FAST.style === 'tiktok' || FAST.style === 'why' || FAST.style === 'retain';
   words.forEach((x, i) => { const cur = c.map((k) => words[k]).join(' ');
     const brk = TT ? (c.length && (c.length >= 2 || cur.length + x.length > 8 || (cur.length > 3 && x.length > 3))) : (c.length && (c.length >= 3 || cur.length + x.length > 16));
     if (brk) { chunks.push(c); c = []; } c.push(i); });
@@ -556,6 +556,7 @@ function capWords(v) {
 }
 function fastOverlays(v) {
   $('title').style.opacity = '0'; $('sub').style.opacity = '0';
+  if (FAST.endCard) { const ec = $('end'); const ve = window.DURATION - FAST.endCard.dur; ec.innerHTML = FAST.endCard.text; ec.style.opacity = v >= ve ? '1' : '0'; ec.style.transform = `scale(${1 + 0.15 * Math.exp(-(v - ve) * 8)})`; }
   if (FAST.style === 'why') { const tb = $('tbox'); tb.innerHTML = `<span>${DATA.titleBox}</span>`; tb.style.opacity = '1'; }
   const hk = $('hook'); hk.innerHTML = FAST.hook.text; hk.style.opacity = v < FAST.H ? '1' : '0';
   hk.style.transform = `scale(${1 + 0.12 * Math.exp(-v * 7)})`;
@@ -572,6 +573,11 @@ window.renderAt = (v) => {
   if (FAST) {
     const cutV = v < FAST.H ? 0 : Math.max(FAST.H, toVideo(s.t0));
     const k = clamp((v - cutV) / 0.24); let fovMul = 1 + 0.16 * (1 - easeOut(k)), shake = 0, flash = 0;
+    if (FAST.style === 'retain') {
+      const shotLen = Math.max(0.5, Math.min(toVideo(s.t1), window.DURATION) - cutV); const uu = clamp((v - cutV) / shotLen);
+      fovMul = (1 + 0.07 * (1 - easeOut(clamp((v - cutV) / 0.2)))) * (1 - 0.08 * uu);
+      const since = v - cutV; grade.uniforms.uTint.value = since < 0.07 ? 0.3 * (1 - since / 0.07) : 0; grade.uniforms.uTintC.value.set(1, 1, 1);
+    }
     if (FAST.style === 'tiktok') {
       const seg = Math.floor((v - cutV) / 0.62); fovMul = [1, 0.8, 0.9, 0.74][seg % 4];  // hard punch-in jump cuts
       const ci = Math.round(cutV * 10); const since = v - cutV; const segSince = (v - cutV) - seg * 0.62;
@@ -602,10 +608,10 @@ DATA = await (await fetch(`${DIR}.json`)).json();
 $('titlePov').innerHTML = DATA.title[0]; $('titleMain').innerHTML = DATA.title[1];
 if (DATA.why) { DATA.fast = { K: 1, style: 'why', hook: { t: 0, dur: 0, text: '' } }; DATA.titleUntil = 0; DATA.subs = DATA.subs || [[0, 1, '']]; document.body.classList.add('why'); await document.fonts.load("900 96px 'Inter'"); await document.fonts.load("800 76px 'Inter'"); }
 if (DATA.fast) {
-  FAST = { ...DATA.fast }; if (FAST.style === 'tiktok') { document.body.classList.add('tt'); await document.fonts.load("132px 'Anton'"); } FAST.H = FAST.hook.dur;
+  FAST = { ...DATA.fast }; if (FAST.style === 'tiktok' || FAST.style === 'retain') { document.body.classList.add('tt'); await document.fonts.load("132px 'Anton'"); } FAST.H = FAST.hook.dur;
   try { const r = await fetch(`./eps/out/ep${EP}_vo.json`); if (r.ok) { const j = await r.json(); VOJSON = j; VO = j.lines; if (j.hookDur) FAST.H = j.hookDur; } } catch (e) {}
   const last = DATA.subs[DATA.subs.length - 1];
-  window.DURATION = DATA.why && VOJSON ? VOJSON.dur : Math.ceil((toVideo(last[1]) + 0.25) * FPS) / FPS;
+  window.DURATION = VOJSON && VOJSON.dur ? VOJSON.dur : Math.ceil((toVideo(last[1]) + 0.25 + (FAST.endCard ? FAST.endCard.dur : 0)) * FPS) / FPS;
 } else window.DURATION = DURATION;
 const ep = await import(`${DIR}.js`);
 const CLIPNAMES = ep.usesHumans ? await initHumans() : [];

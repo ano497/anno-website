@@ -1,0 +1,104 @@
+{
+ "slug": "they-deliver-houses-now",
+ "title": [
+  "",
+  ""
+ ],
+ "titleUntil": 0,
+ "subs": [
+  [
+   0.0,
+   3.6,
+   "In 2034, a delivery app started shipping whole houses.",
+   "In twenty thirty-four, a delivery app started shipping whole houses."
+  ],
+  [
+   3.6,
+   6.21,
+   "Order at night. It arrives by morning."
+  ],
+  [
+   6.21,
+   8.49,
+   "Drones carry it across the city."
+  ],
+  [
+   8.49,
+   10.11,
+   "Sky traffic got terrible."
+  ],
+  [
+   10.11,
+   12.06,
+   "Some houses arrived upside down."
+  ],
+  [
+   12.06,
+   14.34,
+   "One family got the wrong house."
+  ],
+  [
+   14.34,
+   16.62,
+   "Theirs landed in a stranger's backyard."
+  ],
+  [
+   16.62,
+   18.9,
+   "The stranger left a one-star review."
+  ],
+  [
+   18.9,
+   21.18,
+   "Then the drivers went on strike."
+  ],
+  [
+   21.18,
+   23.46,
+   "Thousands of houses got stuck mid-air."
+  ],
+  [
+   23.46,
+   25.41,
+   "People still live in them."
+  ],
+  [
+   25.41,
+   27.69,
+   "Delivery estimate: three to five years."
+  ]
+ ],
+ "labels": [],
+ "fast": {
+  "K": 1,
+  "style": "retain",
+  "hook": {
+   "t": 8.7,
+   "dur": 2.0,
+   "text": "THEY DELIVER <b>HOUSES</b> NOW",
+   "say": "Someone started delivering entire houses."
+  },
+  "punch": [
+   4,
+   7,
+   9,
+   11
+  ],
+  "endCard": {
+   "text": "WHAT SHOULD THEY DELIVER NEXT? 👇",
+   "dur": 1.8
+  }
+ },
+ "amb": [
+  [
+   0.0,
+   60,
+   "city"
+  ]
+ ],
+ "sfx": [],
+ "music": {
+  "prog": "pop",
+  "bpm": 124
+ }
+}

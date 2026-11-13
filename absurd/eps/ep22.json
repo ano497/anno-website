@@ -1,0 +1,109 @@
+{
+ "slug": "gravity-is-a-subscription",
+ "title": [
+  "",
+  ""
+ ],
+ "titleUntil": 0,
+ "subs": [
+  [
+   0.0,
+   3.93,
+   "In 2035, a gym chain bought the rights to gravity.",
+   "In twenty thirty-five, a gym chain bought the rights to gravity."
+  ],
+  [
+   3.93,
+   5.88,
+   "Gravity became a monthly plan."
+  ],
+  [
+   5.88,
+   8.82,
+   "Free users float for ten minutes every hour."
+  ],
+  [
+   8.82,
+   11.1,
+   "Commuters started tying themselves to benches."
+  ],
+  [
+   11.1,
+   12.72,
+   "Basketball got very weird."
+  ],
+  [
+   12.72,
+   14.34,
+   "Then they added ads."
+  ],
+  [
+   14.34,
+   17.28,
+   "Free users float until the ad is over."
+  ],
+  [
+   17.28,
+   19.56,
+   "Some ads were thirty seconds long."
+  ],
+  [
+   19.56,
+   21.18,
+   "Birds were very confused."
+  ],
+  [
+   21.18,
+   24.45,
+   "Then the gym forgot to renew its own subscription."
+  ],
+  [
+   24.45,
+   26.4,
+   "The whole headquarters floated away."
+  ],
+  [
+   26.4,
+   29.01,
+   "Nobody knows who to cancel with now."
+  ],
+  [
+   29.01,
+   30.96,
+   "So everyone just holds on."
+  ]
+ ],
+ "labels": [],
+ "fast": {
+  "K": 1,
+  "style": "retain",
+  "hook": {
+   "t": 7.4,
+   "dur": 2.0,
+   "text": "GRAVITY IS NOW A <b>SUBSCRIPTION</b>",
+   "say": "Gravity just became a subscription."
+  },
+  "punch": [
+   2,
+   6,
+   9,
+   12
+  ],
+  "endCard": {
+   "text": "WOULD YOU PAY FOR GRAVITY? 👇",
+   "dur": 1.8
+  }
+ },
+ "amb": [
+  [
+   0.0,
+   60,
+   "city"
+  ]
+ ],
+ "sfx": [],
+ "music": {
+  "prog": "wonder",
+  "bpm": 124
+ }
+}
