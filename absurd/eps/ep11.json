@@ -1,0 +1,29 @@
+{
+ "slug": "why-airplane-windows-are-round",
+ "why": true,
+ "titleBox": "Why Airplane Windows<br>Are Round",
+ "title": ["", ""],
+ "subs": [[0, 1, ""]],
+ "lines": [
+  "Ever noticed airplane windows are never square?",
+  "Well, in the 1950s, they were.",
+  "The Comet was the world's first jet airliner.",
+  "It flew higher and faster than anything before it.",
+  "But in 1954, two of them broke apart in mid-air.",
+  "So engineers put a whole Comet in a giant water tank,",
+  "and pressurized it again and again.",
+  "See, every flight, the cabin puffs up a little,",
+  "then shrinks back down when you land.",
+  "And all that stress piles up in the sharp corners.",
+  "Thousands of flights later, the metal cracks.",
+  "Round windows spread that stress out evenly.",
+  "No corners, no weak spot.",
+  "So that's why your window is round.",
+  "But why does it have a tiny hole in it?",
+  "That's part two."
+ ],
+ "ambAll": ["wind"],
+ "ambLines": [[5, 7, "water"]],
+ "sfxLines": [[4, 0.4, "boom"], [6, 0.3, "thud"], [10, 0.6, "pop"], [14, 0.1, "ding"]],
+ "music": {"prog": "wonder", "bpm": 100}
+}

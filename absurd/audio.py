@@ -9,8 +9,15 @@ import numpy as np
 SR = 48000; DUR = 60.0
 ep = sys.argv[1]
 D = json.load(open(f'eps/ep{ep}.json'))
-FAST = D.get('fast'); VOJ = None
-if FAST:  # fast edit: timings follow the voice track written by voice.py --fast
+FAST = D.get('fast'); VOJ = None; WHY = D.get('why', False)
+if WHY:
+    VOJ = json.load(open(f'eps/out/ep{ep}_vo.json')); DUR = VOJ['dur']; L = VOJ['lines']
+    st = lambda i: L[i]['start'] if i < len(L) else DUR
+    D['amb'] = [[0, DUR, k] for k in D.get('ambAll', [])] + [[st(a), st(b), k] for a, b, k in D.get('ambLines', [])]
+    D['sfx'] = [[st(i) + o, k] for i, o, k in D.get('sfxLines', [])]
+    D['fadeOut'] = DUR + 5; D.setdefault('music', {}).setdefault('bpm', 100)
+    FAST = {'why': True}
+elif FAST:  # fast edit: timings follow the voice track written by voice.py --fast
     VOJ = json.load(open(f'eps/out/ep{ep}_vo.json')); DUR = VOJ['dur']
     _H, _K, _S0 = VOJ['hookDur'], FAST['K'], D.get('titleUntil', 3.2)
     tv = lambda x: _H + (x - _S0) / _K if x >= _S0 else x * _H / _S0
@@ -92,9 +99,10 @@ if FAST:
     for b in range(nb):
         tb = b * beat
         if tb < 0.0: continue
-        add(K1, tb, 0, 0.55 if b % 2 == 0 else 0.4)
-        if b % 2 == 1: add(S1, tb, 0, 0.32)
-        add(HH, tb + beat / 2, 0.3, 0.18); add(HH, tb, -0.3, 0.1)
+        g = 0.45 if WHY else 1
+        add(K1, tb, 0, (0.55 if b % 2 == 0 else 0.4) * g)
+        if b % 2 == 1: add(S1, tb, 0, 0.32 * g)
+        add(HH, tb + beat / 2, 0.3, 0.18 * g); add(HH, tb, -0.3, 0.1 * g)
 music = spec_filter(music[:, 0], hi=7000)[:, None] * [1, 0] + spec_filter(music[:, 1], hi=7000)[:, None] * [0, 1]
 music = norm(music, 0.5)
 # music sits back during the cold open, swells slightly in the last bar, cut at fadeOut
@@ -195,7 +203,7 @@ for t0, kind in D.get('sfx', []):
     s = sfx(kind); a = int(t0 * SR); b = min(N, a + len(s))
     bed[a:b, 0] += s[:b - a]; bed[a:b, 1] += s[:b - a]
 
-out = norm(bed, 0.55) + music * (1.25 if FAST else 1)
+out = norm(bed, 0.55) + music * (0.9 if WHY else 1.25 if FAST else 1)
 out = norm(out, 0.89)
 if FAST:  # mix the narration in, with a light duck
     with wave.open(f'eps/out/ep{ep}_narr.wav') as w:

@@ -386,6 +386,79 @@ export function city({ nx = 8, nz = 8, block = 34, road = 12, seed = 3, night = 
   if (parent) parent.add(G); return G;
 }
 
+// ---------- flat 2D cartoon guy (canvas sprite billboard) ----------
+export function guy(o = {}) {
+  const c = document.createElement('canvas'); c.width = 512; c.height = 1024; const g = c.getContext('2d');
+  const tex = new THREE.CanvasTexture(c); tex.colorSpace = THREE.SRGBColorSpace;
+  const H = o.height || 1.9;
+  const geo = new THREE.PlaneGeometry(H / 2, H); geo.translate(0, H / 2, 0);
+  const m = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ map: tex, transparent: true, alphaTest: 0.4, side: THREE.DoubleSide, fog: false }));
+  m.renderOrder = 5;
+  const shadow = new THREE.Mesh(new THREE.CircleGeometry(H * 0.2, 24), new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.28, depthWrite: false })); shadow.rotation.x = -Math.PI / 2; shadow.position.y = 0.02; shadow.scale.y = 0.45;
+  const G = new THREE.Group(); G.add(m, shadow);
+  const INK = '#1b1b1f', job = o.job || 'plain';
+  const st = { talk: 0, pose: 'idle', walk: 0, blink: 0, look: 0, mood: 'smug', flip: false };
+  G.state = st;
+  function line(x1, y1, x2, y2, w = 15) { g.strokeStyle = INK; g.lineWidth = w; g.lineCap = 'round'; g.beginPath(); g.moveTo(x1, y1); g.lineTo(x2, y2); g.stroke(); }
+  function rr(x, y, w, h, r) { g.beginPath(); g.roundRect(x, y, w, h, r); }
+  function draw(v) {
+    g.clearRect(0, 0, 512, 1024);
+    if (st.flip) { g.save(); g.translate(512, 0); g.scale(-1, 1); }
+    const bob = st.walk ? Math.abs(Math.sin(v * 9)) * 8 : Math.sin(v * 2.2) * 3;
+    const sw = st.walk ? Math.sin(v * 9) * 0.45 : 0;
+    // legs
+    const hipY = 690 - bob;
+    line(232, hipY, 232 + Math.sin(sw) * 120, 985); line(280, hipY, 280 - Math.sin(sw) * 120, 985);
+    g.fillStyle = INK; for (const [x] of [[232 + Math.sin(sw) * 120], [280 - Math.sin(sw) * 120]]) { g.beginPath(); g.ellipse(x + 14, 988, 30, 14, 0, 0, Math.PI * 2); g.fill(); }
+    // arms (behind body for idle)
+    const sh = 520 - bob; const pose = st.pose;
+    const arm = (side) => { const x0 = 256 + side * 92; let x1, y1;
+      if (pose === 'point' && side > 0) { x1 = x0 + 150; y1 = sh - 120; }
+      else if (pose === 'shrug') { x1 = x0 + side * 110; y1 = sh - 70; }
+      else if (pose === 'wave' && side > 0) { x1 = x0 + 90 + Math.sin(v * 10) * 30; y1 = sh - 190; }
+      else if (pose === 'explain' && side > 0) { x1 = x0 + 120; y1 = sh + 40 + Math.sin(v * 5) * 25; }
+      else { x1 = x0 + side * 30; y1 = sh + 190; }
+      line(x0, sh, x1, y1, 14); g.fillStyle = INK; g.beginPath(); g.arc(x1, y1, 13, 0, Math.PI * 2); g.fill(); };
+    arm(-1); arm(1);
+    // body / outfit
+    const o2 = o.outfit || { body: '#3aa9a0', trim: '#1b1b1f' };
+    rr(162, 470 - bob, 188, 240, 46); g.fillStyle = o2.body; g.fill(); g.lineWidth = 9; g.strokeStyle = INK; g.stroke();
+    if (o2.stripes) { g.save(); rr(162, 470 - bob, 188, 240, 46); g.clip(); g.fillStyle = o2.stripes; for (let y = 490; y < 720; y += 34) g.fillRect(150, y - bob, 220, 14); g.restore(); rr(162, 470 - bob, 188, 240, 46); g.lineWidth = 9; g.strokeStyle = INK; g.stroke(); }
+    if (o2.straps) { g.fillStyle = o2.straps; g.fillRect(196, 470 - bob, 18, 240); g.fillRect(298, 470 - bob, 18, 240); }
+    if (o2.buttons) { g.fillStyle = o2.buttons; for (const y of [545, 600, 655]) { g.beginPath(); g.arc(256, y - bob, 8, 0, 7); g.fill(); } }
+    if (o2.collar) { g.fillStyle = o2.collar; g.beginPath(); g.moveTo(206, 470 - bob); g.lineTo(256, 525 - bob); g.lineTo(306, 470 - bob); g.closePath(); g.fill(); g.lineWidth = 6; g.stroke(); }
+    if (o2.tie) { g.fillStyle = o2.tie; g.beginPath(); g.moveTo(256, 500 - bob); g.lineTo(240, 580 - bob); g.lineTo(256, 610 - bob); g.lineTo(272, 580 - bob); g.closePath(); g.fill(); }
+    if (o2.wings) { g.fillStyle = o2.wings; rr(276, 540 - bob, 52, 14, 6); g.fill(); }
+    if (o2.bandana) { g.fillStyle = o2.bandana; g.beginPath(); g.moveTo(216, 470 - bob); g.lineTo(256, 520 - bob); g.lineTo(296, 470 - bob); g.closePath(); g.fill(); }
+    // head
+    const hx = 256, hy = 330 - bob; const R = 132;
+    g.fillStyle = '#fbfaf6'; g.beginPath(); g.arc(hx, hy, R, 0, Math.PI * 2); g.fill(); g.lineWidth = 10; g.strokeStyle = INK; g.stroke();
+    // hair tuft on the side
+    g.fillStyle = o.hair || '#7a4a26'; g.beginPath(); g.arc(hx - 96, hy - 30, 46, Math.PI * 0.55, Math.PI * 1.6); g.closePath(); g.fill();
+    // eyes (smug half-lids) + blink
+    const blink = (v % 3.7) < 0.12;
+    const lk = st.look * 10;
+    for (const ex of [hx - 52 + lk, hx + 46 + lk]) {
+      if (blink) line(ex - 26, hy - 6, ex + 22, hy - 6, 10);
+      else { line(ex - 26, hy - 22, ex + 24, hy - 14, 11); g.fillStyle = INK; g.beginPath(); g.ellipse(ex + 2, hy - 2, 13, 11, 0, 0, Math.PI * 2); g.fill(); }
+    }
+    // mouth: smirk, opens with the voice
+    const t = Math.min(1, st.talk);
+    if (t > 0.08) { g.fillStyle = '#3a1416'; g.beginPath(); g.ellipse(hx + 6, hy + 62, 26, 6 + t * 26, 0, 0, Math.PI * 2); g.fill(); g.lineWidth = 7; g.strokeStyle = INK; g.stroke(); }
+    else { g.lineWidth = 9; g.strokeStyle = INK; g.beginPath(); g.moveTo(hx - 22, hy + 60); g.quadraticCurveTo(hx + 10, hy + 78, hx + 38, hy + 50); g.stroke(); }
+    // hats
+    const hat = o.hat;
+    if (hat === 'pilot') { g.fillStyle = '#1e2c4f'; rr(hx - 120, hy - 190, 240, 80, 30); g.fill(); g.lineWidth = 9; g.strokeStyle = INK; g.stroke(); g.fillStyle = INK; rr(hx - 140, hy - 118, 280, 22, 11); g.fill(); g.fillStyle = '#f2c14e'; g.beginPath(); g.arc(hx, hy - 152, 18, 0, 7); g.fill(); rr(hx - 90, hy - 128, 180, 10, 5); g.fill(); }
+    if (hat === 'mechanic') { g.fillStyle = '#d9483b'; g.beginPath(); g.arc(hx, hy - 92, 120, Math.PI, 0); g.closePath(); g.fill(); g.lineWidth = 9; g.strokeStyle = INK; g.stroke(); g.fillStyle = '#b23a2f'; rr(hx + 20, hy - 104, 150, 26, 12); g.fill(); g.stroke(); g.fillStyle = '#fff'; g.beginPath(); g.arc(hx - 10, hy - 150, 20, 0, 7); g.fill(); }
+    if (hat === 'sailor') { g.fillStyle = '#ffffff'; g.beginPath(); g.ellipse(hx, hy - 110, 150, 34, 0, 0, Math.PI * 2); g.fill(); g.lineWidth = 9; g.strokeStyle = INK; g.stroke(); rr(hx - 100, hy - 190, 200, 80, 20); g.fill(); g.stroke(); g.fillStyle = '#1e2c4f'; g.fillRect(hx - 100, hy - 140, 200, 22); }
+    if (hat === 'conductor') { g.fillStyle = '#2a4f8f'; rr(hx - 125, hy - 185, 250, 90, 40); g.fill(); g.strokeStyle = INK; g.lineWidth = 9; g.stroke(); g.fillStyle = '#ffffff'; for (let x = -100; x < 120; x += 36) g.fillRect(hx + x, hy - 180, 12, 82); g.fillStyle = INK; rr(hx - 135, hy - 104, 270, 20, 10); g.fill(); }
+    if (st.flip) g.restore();
+    tex.needsUpdate = true;
+  }
+  G.userData.update = (v) => { m.quaternion.copy(camera.quaternion); draw(v); };
+  draw(0); return G;
+}
+
 // ---------- post ----------
 const composer = new EffectComposer(renderer);
 composer.setPixelRatio(1); composer.setSize(W, H);
@@ -457,7 +530,7 @@ function runShot(s, t) {
 }
 window.FPS = FPS;
 // ---- "fast" edit mode: hook flash-forward, sped-up story, word captions, snap zooms ----
-let FAST = null, VO = null;
+let FAST = null, VO = null, VOJSON = null;
 const S0 = () => DATA.titleUntil ?? 3.2;
 const toScene = (v) => v < FAST.H ? FAST.hook.t + v * 0.5 : S0() + (v - FAST.H) * FAST.K;
 const toVideo = (t) => FAST.H + (t - S0()) / FAST.K;
@@ -473,7 +546,7 @@ function capWords(v) {
   let wi = 0; times.forEach((t0, i) => { if (v >= t0) wi = i; });
   // chunks of up to 3 words / 16 chars
   const chunks = []; let c = [];
-  const TT = FAST.style === 'tiktok';
+  const TT = FAST.style === 'tiktok' || FAST.style === 'why';
   words.forEach((x, i) => { const cur = c.map((k) => words[k]).join(' ');
     const brk = TT ? (c.length && (c.length >= 2 || cur.length + x.length > 8 || (cur.length > 3 && x.length > 3))) : (c.length && (c.length >= 3 || cur.length + x.length > 16));
     if (brk) { chunks.push(c); c = []; } c.push(i); });
@@ -483,10 +556,11 @@ function capWords(v) {
 }
 function fastOverlays(v) {
   $('title').style.opacity = '0'; $('sub').style.opacity = '0';
+  if (FAST.style === 'why') { const tb = $('tbox'); tb.innerHTML = `<span>${DATA.titleBox}</span>`; tb.style.opacity = '1'; }
   const hk = $('hook'); hk.innerHTML = FAST.hook.text; hk.style.opacity = v < FAST.H ? '1' : '0';
   hk.style.transform = `scale(${1 + 0.12 * Math.exp(-v * 7)})`;
   const cw = capWords(v); const ce = $('cap');
-  if (cw && v >= FAST.H - 0.02 || (cw && !FAST.hook.text)) { ce.innerHTML = cw.html; ce.style.opacity = '1'; ce.style.transform = `translateX(-50%) scale(${1 + (FAST.style === 'tiktok' ? 0.1 : 0.18) * Math.exp(-cw.since * (FAST.style === 'tiktok' ? 30 : 18))})`; } else ce.style.opacity = '0';
+  if (cw && v >= FAST.H - 0.02 || (cw && !FAST.hook.text)) { ce.innerHTML = cw.html; ce.style.opacity = '1'; ce.style.transform = `translateX(-50%) scale(${1 + (FAST.style !== 'fast' && FAST.style ? 0.1 : 0.18) * Math.exp(-cw.since * (FAST.style === 'tiktok' ? 30 : 18))})`; } else ce.style.opacity = '0';
   const t = toScene(v);
   const lab = v >= FAST.H && (DATA.labels || []).find(([a, b]) => t >= a && t < b);
   const le = $('label'); le.textContent = lab ? lab[2] : ''; le.style.opacity = lab ? '1' : '0';
@@ -507,6 +581,7 @@ window.renderAt = (v) => {
     }
     for (const i of FAST.punch || []) { const vs = toVideo(DATA.subs[i][0]); if (v >= vs) { const p = Math.exp(-(v - vs) * 5); fovMul *= 1 - 0.1 * p; shake = Math.max(shake, p); flash = Math.max(flash, 0.45 * Math.exp(-(v - vs) * 16)); } }
     if (v < 0.12) flash = Math.max(flash, 0.6 * (1 - v / 0.12));
+    if (FAST.style === 'why') { fovMul = 1; shake = 0; flash = 0; }
     camera.fov *= fovMul; camera.updateProjectionMatrix();
     if (shake > 0.02) { camera.rotateZ(Math.sin(v * 71) * 0.025 * shake); camera.rotateX(Math.sin(v * 53) * 0.012 * shake); }
     grade.uniforms.uFade.value = 0; grade.uniforms.uFlash.value = Math.max(flash, s.flash ? s.flash(t) : 0);
@@ -525,15 +600,18 @@ window.renderAt = (v) => {
 const DIR = `./eps/ep${EP}`;
 DATA = await (await fetch(`${DIR}.json`)).json();
 $('titlePov').innerHTML = DATA.title[0]; $('titleMain').innerHTML = DATA.title[1];
+if (DATA.why) { DATA.fast = { K: 1, style: 'why', hook: { t: 0, dur: 0, text: '' } }; DATA.titleUntil = 0; DATA.subs = DATA.subs || [[0, 1, '']]; document.body.classList.add('why'); await document.fonts.load("900 96px 'Inter'"); await document.fonts.load("800 76px 'Inter'"); }
 if (DATA.fast) {
   FAST = { ...DATA.fast }; if (FAST.style === 'tiktok') { document.body.classList.add('tt'); await document.fonts.load("132px 'Anton'"); } FAST.H = FAST.hook.dur;
-  try { const r = await fetch(`./eps/out/ep${EP}_vo.json`); if (r.ok) { const j = await r.json(); VO = j.lines; if (j.hookDur) FAST.H = j.hookDur; } } catch (e) {}
+  try { const r = await fetch(`./eps/out/ep${EP}_vo.json`); if (r.ok) { const j = await r.json(); VOJSON = j; VO = j.lines; if (j.hookDur) FAST.H = j.hookDur; } } catch (e) {}
   const last = DATA.subs[DATA.subs.length - 1];
-  window.DURATION = Math.ceil((toVideo(last[1]) + 0.25) * FPS) / FPS;
+  window.DURATION = DATA.why && VOJSON ? VOJSON.dur : Math.ceil((toVideo(last[1]) + 0.25) * FPS) / FPS;
 } else window.DURATION = DURATION;
 const ep = await import(`${DIR}.js`);
 const CLIPNAMES = ep.usesHumans ? await initHumans() : [];
-await ep.build({ carsInstanced, realPerson, loadGLB, CLIPNAMES, skyMat, hemi, sun, renderer, city, THREE, scene, camera, defineSet, shot, mat, mesh, box, cyl, sphere, sign, textTex, terrain, water, person, crowd, car, tree, particles, rng, fbm, vnoise, clamp, lerp, smooth, ease, easeOut, DATA });
+const lineT = (i) => (VO && VO[i] ? VO[i].start : i * 2.6);
+const mouth = (v) => { if (!VOJSON || !VOJSON.env) return Math.abs(Math.sin(v * 13)) * 0.5; const e = VOJSON.env; const f = Math.floor(v * FPS); return e[f] || 0; };
+await ep.build({ guy, lineT, mouth, VOJSON, carsInstanced, realPerson, loadGLB, CLIPNAMES, skyMat, hemi, sun, renderer, city, THREE, scene, camera, defineSet, shot, mat, mesh, box, cyl, sphere, sign, textTex, terrain, water, person, crowd, car, tree, particles, rng, fbm, vnoise, clamp, lerp, smooth, ease, easeOut, DATA });
 SHOTS.sort((a, b) => a.t0 - b.t0);
 window.renderAt(FAST ? FAST.H + 0.5 : 0.5);
 window.sceneReady = true;

@@ -10,6 +10,7 @@ from kokoro_onnx import Kokoro
 ap = argparse.ArgumentParser(); ap.add_argument('ep'); ap.add_argument('kdir')
 ap.add_argument('--voice', default='bm_george'); ap.add_argument('--speed', type=float, default=1.0)
 ap.add_argument('--sample', action='store_true', help='only write the first 4 lines back to back')
+ap.add_argument('--why', action='store_true', help='explainer: lines back to back, writes narration + timing + mouth envelope')
 ap.add_argument('--fast', action='store_true', help='fast edit: hook line + sped-up timeline, writes narration + timing json')
 a = ap.parse_args()
 D = json.load(open(f'eps/ep{a.ep}.json'))
@@ -23,6 +24,23 @@ def resample(x, sr_in):
 def trim(x, thr=0.01):
     nz = np.where(np.abs(x) > thr)[0]; return x[max(0, nz[0] - 480): nz[-1] + 2400] if len(nz) else x
 
+if a.why:
+    import wave as _w
+    out, lines, cur = [], [], 0.35
+    for ln in D['lines']:
+        cap, spoken = (ln, ln) if isinstance(ln, str) else (ln[0], ln[1])
+        x, sr = k.create(spoken, voice=a.voice, speed=a.speed, lang=lang); x = trim(resample(np.asarray(x, dtype=np.float64), sr))
+        lines.append({'start': round(cur, 3), 'dur': round(len(x) / SR, 3), 'text': cap}); out.append((cur, x)); cur += len(x) / SR + 0.16
+        print(f'{lines[-1]["start"]:5.2f}s {len(x)/SR:4.2f}s  {spoken}')
+    DUR = cur + 0.9; vo = np.zeros(int(SR * DUR))
+    for t0, x in out: i0 = int(t0 * SR); vo[i0:i0 + len(x)] += x
+    vo = vo / np.abs(vo).max() * 0.95
+    hop = SR // 30; env = [float(np.sqrt(np.mean(vo[i:i + hop] ** 2))) for i in range(0, len(vo), hop)]
+    m = max(env) or 1; env = [round(min(1, e / m * 1.6), 3) for e in env]
+    with _w.open(f'eps/out/ep{a.ep}_narr.wav', 'wb') as w:
+        w.setnchannels(1); w.setsampwidth(2); w.setframerate(SR); w.writeframes((vo * 32767).astype(np.int16).tobytes())
+    json.dump({'hookDur': 0, 'dur': DUR, 'lines': lines, 'env': env}, open(f'eps/out/ep{a.ep}_vo.json', 'w'))
+    print('why narration', a.ep, f'{DUR:.1f}s'); raise SystemExit
 if a.fast:
     import wave as _w
     F = D['fast']; K = F['K']; S0 = D.get('titleUntil', 3.2)

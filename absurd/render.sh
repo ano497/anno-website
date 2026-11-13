@@ -5,7 +5,11 @@ KOKORO_DIR=${KOKORO_DIR:-/tmp/claude-0/-home-user-anno-website/b8b10682-fbba-58a
 cd "$(dirname "$0")"
 EP=$1; SLUG=$(python3 -c "import json;print(json.load(open('eps/ep$EP.json'))['slug'])")
 mkdir -p segments/$EP eps/out videos
-if python3 -c "import json,sys;sys.exit(0 if json.load(open('eps/ep$EP.json')).get('fast') else 1)"; then
+if python3 -c "import json,sys;sys.exit(0 if json.load(open('eps/ep$EP.json')).get('why') else 1)"; then
+  python3 voice.py $EP "$KOKORO_DIR" --why --voice ${VOICE:-am_michael} --speed ${SPEED:-1.08}
+  python3 audio.py $EP
+  TOTAL=$(python3 -c "import json,math;print(math.ceil(json.load(open('eps/out/ep${EP}_vo.json'))['dur']*30))")
+elif python3 -c "import json,sys;sys.exit(0 if json.load(open('eps/ep$EP.json')).get('fast') else 1)"; then
   python3 voice.py $EP "$KOKORO_DIR" --fast --voice ${VOICE:-am_michael} --speed ${SPEED:-1.12}
   python3 audio.py $EP
   TOTAL=$(python3 -c "import json,math;print(math.ceil(json.load(open('eps/out/ep${EP}_vo.json'))['dur']*30))")
