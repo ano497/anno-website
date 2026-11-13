@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <title>Absurd Documentary</title>
 <style>
+  @font-face { font-family: 'Anton'; src: url('assets/fonts/Anton-Regular.ttf') format('truetype'); }
   html, body { margin: 0; padding: 0; background: #000; overflow: hidden; }
   #stage { position: relative; width: 1080px; height: 1920px; overflow: hidden; }
   canvas { display: block; }
@@ -29,6 +30,11 @@
     font: 900 104px/1.05 'DejaVu Sans', sans-serif; color: #fff; text-transform: uppercase; letter-spacing: -1px;
     -webkit-text-stroke: 12px #000; paint-order: stroke fill; text-shadow: 0 9px 0 rgba(0,0,0,.6); }
   #cap .on { color: #ffd23f; }
+  body.tt #cap { font: 400 132px/1.0 'Anton', sans-serif; letter-spacing: 1px; -webkit-text-stroke: 5px #000; color: #fff;
+    text-shadow: 0 6px 14px rgba(0,0,0,.85), 0 0 4px rgba(0,0,0,.9); top: 760px; }
+  body.tt #cap .on { color: #fff; }
+  body.tt #hook b { color: #fff; }
+  body.tt #hook { font: 400 112px/1.02 'Anton', sans-serif; letter-spacing: 1px; -webkit-text-stroke: 5px #000; text-shadow: 0 6px 14px rgba(0,0,0,.85); top: 640px; }
 </style>
 </head>
 <body>

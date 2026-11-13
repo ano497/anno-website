@@ -393,9 +393,9 @@ composer.addPass(new RenderPass(scene, camera));
 const bloom = new UnrealBloomPass(new THREE.Vector2(W, H), 0.25, 0.4, 0.92); composer.addPass(bloom);
 composer.addPass(new OutputPass());
 const grade = new ShaderPass({
-  uniforms: { tDiffuse: { value: null }, uTilt: { value: 0.7 }, uFocus: { value: 0.5 }, uBand: { value: 0.1 }, uSat: { value: 1.18 }, uFade: { value: 0 }, uFlash: { value: 0 }, uSeed: { value: 0 }, uRes: { value: new THREE.Vector2(W, H) } },
+  uniforms: { tDiffuse: { value: null }, uTilt: { value: 0.7 }, uFocus: { value: 0.5 }, uBand: { value: 0.1 }, uSat: { value: 1.18 }, uFade: { value: 0 }, uFlash: { value: 0 }, uTint: { value: 0 }, uTintC: { value: new THREE.Vector3(1, 1, 1) }, uSeed: { value: 0 }, uRes: { value: new THREE.Vector2(W, H) } },
   vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix*modelViewMatrix*vec4(position,1.); }',
-  fragmentShader: `uniform sampler2D tDiffuse; uniform float uTilt, uFocus, uBand, uSat, uFade, uFlash, uSeed; uniform vec2 uRes; varying vec2 vUv;
+  fragmentShader: `uniform sampler2D tDiffuse; uniform float uTilt, uFocus, uBand, uSat, uFade, uFlash, uSeed, uTint; uniform vec3 uTintC; uniform vec2 uRes; varying vec2 vUv;
     float h(vec2 p){ return fract(sin(dot(p, vec2(12.9898,78.233))) * 43758.5453); }
     void main(){
       float d = max(abs(vUv.y - uFocus) - uBand, 0.);
@@ -415,6 +415,7 @@ const grade = new ShaderPass({
       col *= smoothstep(0.95, 0.35, length((vUv - 0.5) * vec2(0.9, 1.1)));
       col += (h(vUv * uRes + uSeed) - 0.5) * 0.025;
       col = mix(col, vec3(1.), uFlash);
+      col = mix(col, min(vec3(1.), col * uTintC * 1.7 + uTintC * 0.12), uTint);
       col *= 1. - uFade;
       gl_FragColor = vec4(col, 1.);
     }`,
@@ -472,7 +473,10 @@ function capWords(v) {
   let wi = 0; times.forEach((t0, i) => { if (v >= t0) wi = i; });
   // chunks of up to 3 words / 16 chars
   const chunks = []; let c = [];
-  words.forEach((x, i) => { if (c.length && (c.length >= 3 || c.map((k) => words[k]).join(' ').length + x.length > 16)) { chunks.push(c); c = []; } c.push(i); });
+  const TT = FAST.style === 'tiktok';
+  words.forEach((x, i) => { const cur = c.map((k) => words[k]).join(' ');
+    const brk = TT ? (c.length && (c.length >= 2 || cur.length + x.length > 8 || (cur.length > 3 && x.length > 3))) : (c.length && (c.length >= 3 || cur.length + x.length > 16));
+    if (brk) { chunks.push(c); c = []; } c.push(i); });
   if (c.length) chunks.push(c);
   const ch = chunks.find((k) => k.includes(wi));
   return { html: ch.map((k) => `<span class="${k === wi ? 'on' : ''}">${words[k]}</span>`).join(' '), since: v - times[ch[0]] };
@@ -482,7 +486,7 @@ function fastOverlays(v) {
   const hk = $('hook'); hk.innerHTML = FAST.hook.text; hk.style.opacity = v < FAST.H ? '1' : '0';
   hk.style.transform = `scale(${1 + 0.12 * Math.exp(-v * 7)})`;
   const cw = capWords(v); const ce = $('cap');
-  if (cw && v >= FAST.H - 0.02 || (cw && !FAST.hook.text)) { ce.innerHTML = cw.html; ce.style.opacity = '1'; ce.style.transform = `translateX(-50%) scale(${1 + 0.18 * Math.exp(-cw.since * 18)})`; } else ce.style.opacity = '0';
+  if (cw && v >= FAST.H - 0.02 || (cw && !FAST.hook.text)) { ce.innerHTML = cw.html; ce.style.opacity = '1'; ce.style.transform = `translateX(-50%) scale(${1 + (FAST.style === 'tiktok' ? 0.1 : 0.18) * Math.exp(-cw.since * (FAST.style === 'tiktok' ? 30 : 18))})`; } else ce.style.opacity = '0';
   const t = toScene(v);
   const lab = v >= FAST.H && (DATA.labels || []).find(([a, b]) => t >= a && t < b);
   const le = $('label'); le.textContent = lab ? lab[2] : ''; le.style.opacity = lab ? '1' : '0';
@@ -494,6 +498,13 @@ window.renderAt = (v) => {
   if (FAST) {
     const cutV = v < FAST.H ? 0 : Math.max(FAST.H, toVideo(s.t0));
     const k = clamp((v - cutV) / 0.24); let fovMul = 1 + 0.16 * (1 - easeOut(k)), shake = 0, flash = 0;
+    if (FAST.style === 'tiktok') {
+      const seg = Math.floor((v - cutV) / 0.62); fovMul = [1, 0.8, 0.9, 0.74][seg % 4];  // hard punch-in jump cuts
+      const ci = Math.round(cutV * 10); const since = v - cutV; const segSince = (v - cutV) - seg * 0.62;
+      const tint = [[0.55, 1.0, 0.45], [1.0, 0.62, 0.3], [1, 1, 1]][ci % 3];
+      const amt = since < 0.1 ? 0.55 * (1 - since / 0.1) : (seg > 0 && segSince < 0.05 && seg % 3 === 2 ? 0.35 : 0);
+      grade.uniforms.uTintC.value.set(...tint); grade.uniforms.uTint.value = amt;
+    }
     for (const i of FAST.punch || []) { const vs = toVideo(DATA.subs[i][0]); if (v >= vs) { const p = Math.exp(-(v - vs) * 5); fovMul *= 1 - 0.1 * p; shake = Math.max(shake, p); flash = Math.max(flash, 0.45 * Math.exp(-(v - vs) * 16)); } }
     if (v < 0.12) flash = Math.max(flash, 0.6 * (1 - v / 0.12));
     camera.fov *= fovMul; camera.updateProjectionMatrix();
@@ -515,7 +526,7 @@ const DIR = `./eps/ep${EP}`;
 DATA = await (await fetch(`${DIR}.json`)).json();
 $('titlePov').innerHTML = DATA.title[0]; $('titleMain').innerHTML = DATA.title[1];
 if (DATA.fast) {
-  FAST = { ...DATA.fast }; FAST.H = FAST.hook.dur;
+  FAST = { ...DATA.fast }; if (FAST.style === 'tiktok') { document.body.classList.add('tt'); await document.fonts.load("132px 'Anton'"); } FAST.H = FAST.hook.dur;
   try { const r = await fetch(`./eps/out/ep${EP}_vo.json`); if (r.ok) { const j = await r.json(); VO = j.lines; if (j.hookDur) FAST.H = j.hookDur; } } catch (e) {}
   const last = DATA.subs[DATA.subs.length - 1];
   window.DURATION = Math.ceil((toVideo(last[1]) + 0.25) * FPS) / FPS;
